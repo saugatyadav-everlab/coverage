@@ -148,6 +148,16 @@ const CASES = {
     expect(s.fraction, 1)
   },
 
+  'a prepaid item populates the summary even though nothing is selected'() {
+    // The summary must not list a prepaid item and claim nothing was added, so
+    // the empty state keys off the line count, not off `anySelected`. Checkout
+    // still stays disabled — there is nothing to pay for.
+    const s = select()
+    expect(s.anySelected, false)
+    expect(s.paid.length, 1)
+    expect(s.total, 0)
+  },
+
   'the at-home draw is charged but never moves the coverage ring'() {
     const without = select({ member: true })
     const with_ = select({ member: true, atHome: true })

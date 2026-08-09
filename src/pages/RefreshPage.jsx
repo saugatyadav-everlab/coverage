@@ -38,7 +38,7 @@ export function summaryLines(selection, membership, money) {
 }
 
 function SummaryPanel({ selection, membership, money, onCheckout, checkoutLabel }) {
-  const { refreshed, outdatedTotal, fraction, paid, subtotal, saved, total, anySelected } = selection
+  const { refreshed, outdatedTotal, fraction, subtotal, saved, total, anySelected } = selection
   const lines = summaryLines(selection, membership, money)
 
   return (
@@ -78,7 +78,7 @@ function SummaryPanel({ selection, membership, money, onCheckout, checkoutLabel 
         </div>
       )}
 
-      {!anySelected && (
+      {lines.length === 0 && (
         <div style={{ padding: '22px 10px 6px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
           <span
             className="bg-bg-neutral-tertiary-100 text-fg-neutral-primary-100"
@@ -87,7 +87,7 @@ function SummaryPanel({ selection, membership, money, onCheckout, checkoutLabel 
             <BasketIcon />
           </span>
           <div>
-            <div className="typography-body-300-medium">{paid.length > 0 ? 'Nothing added yet.' : 'Nothing selected yet.'}</div>
+            <div className="typography-body-300-medium">Nothing selected yet.</div>
             <div className="text-fg-neutral-secondary-100 typography-body-200-regular" style={{ marginTop: 6, lineHeight: 1.5 }}>
               As you add items, you can see how much they contribute to refreshing your outdated biomarkers.
             </div>
