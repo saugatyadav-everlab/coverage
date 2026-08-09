@@ -27,8 +27,10 @@ export const MESSAGE = {
   THEME: 'everlab:coverage:theme',
   READY: 'everlab:coverage:ready',
   RESIZE: 'everlab:coverage:resize',
+  SCROLL_TOP: 'everlab:coverage:scrolltop',
   CLOSE: 'everlab:coverage:close',
   NAVIGATE: 'everlab:coverage:navigate',
+  ERROR: 'everlab:coverage:error',
   CHECKOUT: 'everlab:refresh:checkout',
 }
 

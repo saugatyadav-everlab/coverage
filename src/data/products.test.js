@@ -32,11 +32,21 @@ const BASE_PAYLOAD = {
   ],
 }
 
-function select({ payload = BASE_PAYLOAD, ids = [], member = false } = {}) {
+const AT_HOME = { id: 'at-home-draw', name: 'Get your blood drawn at home', price: 79 }
+
+function select({ payload = BASE_PAYLOAD, ids = [], member = false, atHome = false } = {}) {
   const normalised = normalisePayload(payload)
   const { membership, products, outdated } = resolveProducts(normalised)
   return {
-    ...computeSelection({ membership, products, outdated, selectedIds: ids, membershipSelected: member }),
+    ...computeSelection({
+      membership,
+      products,
+      outdated,
+      selectedIds: ids,
+      membershipSelected: member,
+      atHome: AT_HOME,
+      atHomeSelected: atHome,
+    }),
     membership,
     products,
   }
@@ -136,6 +146,29 @@ const CASES = {
     expect(s.refreshed, 6)
     expect(s.remaining, 0)
     expect(s.fraction, 1)
+  },
+
+  'the at-home draw is charged but never moves the coverage ring'() {
+    const without = select({ member: true })
+    const with_ = select({ member: true, atHome: true })
+
+    expect(with_.total, without.total + 79)
+    expect(with_.atHomeCharged, true)
+    expect(with_.refreshed, without.refreshed, 'it is a delivery choice, not a test')
+  },
+
+  'the at-home draw cannot be charged without the plan'() {
+    // It only exists as an option on the plan, so a stale tick must not bill.
+    const s = select({ ids: ['discounted'], member: false, atHome: true })
+    expect(s.atHomeCharged, false)
+    expect(s.total, 400, 'add-on only, no $79')
+  },
+
+  'the at-home draw is not discounted by membership'() {
+    const s = select({ member: true, atHome: true })
+    expect(s.subtotal, 299 + 79)
+    expect(s.saved, 0)
+    expect(s.total, 378)
   },
 
   'panel-derived contribution is used when no count is given'() {

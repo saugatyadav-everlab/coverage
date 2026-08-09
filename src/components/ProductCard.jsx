@@ -71,7 +71,7 @@ function CardFooter({ product, outdatedTotal, selected, onToggle, money }) {
   )
 }
 
-export function ProductCard({ product, outdatedTotal, selected, onToggle, money }) {
+export function ProductCard({ product, outdatedTotal, selected, onToggle, money, footerExtra = null }) {
   const isMembership = product.kind === 'membership'
   const borderClass = selected && !product.paid ? 'border-br-neutral-primary-100' : 'border-br-neutral-tertiary-100'
 
@@ -158,6 +158,8 @@ export function ProductCard({ product, outdatedTotal, selected, onToggle, money 
         onToggle={handleToggle}
         money={money}
       />
+
+      {footerExtra}
     </div>
   )
 }

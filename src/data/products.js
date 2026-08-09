@@ -159,16 +159,31 @@ export function resolveProducts(payload, { maxRecommended = 2 } = {}) {
 }
 
 /** Price + progress totals for the current selection. */
-export function computeSelection({ membership, products, outdated, selectedIds, membershipSelected }) {
+export function computeSelection({
+  membership,
+  products,
+  outdated,
+  selectedIds,
+  membershipSelected,
+  atHome = null,
+  atHomeSelected = false,
+}) {
   const selected = new Set(selectedIds)
   const isMember = Boolean(membershipSelected)
+
+  // The at-home draw only exists as an option on the plan, so it can't be
+  // charged unless the plan itself is in the basket.
+  const atHomeCharged = Boolean(atHome && isMember && atHomeSelected)
 
   const paid = products.filter((p) => p.paid)
   const chosen = products.filter((p) => !p.paid && selected.has(p.id))
 
   const priceOf = (product) => (isMember ? product.memberPrice : product.price)
 
-  const subtotal = (isMember && membership ? membership.price : 0) + chosen.reduce((sum, p) => sum + p.price, 0)
+  const subtotal =
+    (isMember && membership ? membership.price : 0) +
+    (atHomeCharged ? atHome.price : 0) +
+    chosen.reduce((sum, p) => sum + p.price, 0)
   const saved = isMember ? chosen.reduce((sum, p) => sum + (p.price - p.memberPrice), 0) : 0
   const total = subtotal - saved
 
@@ -193,6 +208,9 @@ export function computeSelection({ membership, products, outdated, selectedIds, 
     chosen,
     paid,
     priceOf,
+    // A delivery choice, not a test — charged, but deliberately absent from the
+    // coverage maths above so the ring doesn't move when it's ticked.
+    atHomeCharged,
     subtotal,
     saved,
     total,

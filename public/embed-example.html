@@ -44,6 +44,7 @@
         <button id="theme">Theme</button>
         <button id="asurl">Open as ?d= URL</button>
         <button id="tests">Run tests</button>
+        <button id="barvariant">Mobile bar: bar</button>
         <span class="size" id="size"></span>
       </div>
 
@@ -173,6 +174,15 @@
       $('reload').onclick = () => go(frame.contentWindow.location.pathname)
       $('bridge').onclick = () => go('/')
       $('refresh').onclick = () => go('/refresh')
+
+      // Two sticky-summary treatments are built so they can be compared at the
+      // narrow breakpoint; one gets deleted once picked.
+      let bar = 'bar'
+      $('barvariant').onclick = () => {
+        bar = bar === 'bar' ? 'sheet' : 'bar'
+        $('barvariant').textContent = `Mobile bar: ${bar}`
+        go(`/refresh?mobilebar=${bar}`)
+      }
 
       $('theme').onclick = () => {
         const theme = frame.dataset.theme === 'dark' ? 'light' : 'dark'

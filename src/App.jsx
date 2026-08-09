@@ -1,50 +1,48 @@
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { useEffect } from 'react'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 
 import { DS } from './ds/loadDs'
 import BridgePage from './pages/BridgePage'
 import RefreshPage from './pages/RefreshPage'
 import { CoverageProvider, useCoverage } from './data/CoverageProvider'
+import { MESSAGE, emit } from './data/host'
 import { useTheme } from './useTheme'
 
-function Centred({ children }) {
-  return (
-    <div
-      className="bg-bg-neutral-primary-invert-100 text-fg-neutral-primary-100"
-      style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', padding: 24, textAlign: 'center' }}
-    >
-      <div style={{ maxWidth: 460, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14 }}>{children}</div>
-    </div>
-  )
+/**
+ * Reset scroll on navigation — React Router keeps the previous position, which
+ * dropped the member partway down the Refresh page.
+ *
+ * Two scrollers to consider. Ours, and the host's: when the embedding app sizes
+ * the iframe to our content there is no internal scrollbar at all, so the page
+ * that actually scrolls is the parent's — which we can't touch cross-origin.
+ * Hence the message; the host has to act on it for the fix to be complete.
+ */
+function ScrollToTop() {
+  const { pathname } = useLocation()
+
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    document.documentElement.scrollTop = 0
+    emit(MESSAGE.SCROLL_TOP, { page: pathname === '/refresh' ? 'refresh' : 'bridge' })
+  }, [pathname])
+
+  return null
 }
 
-/** Holds the routes back until a payload has resolved. */
+/**
+ * Holds the routes back until a payload resolves. There is deliberately no
+ * loading or error UI: this flow is only shown to lapsed members, and the
+ * embedding app owns that chrome. On failure we log and emit, and the host
+ * decides what the member sees.
+ */
 function PayloadGate({ children }) {
-  const { status, error, reload } = useCoverage()
+  const { status, error } = useCoverage()
 
-  if (status === 'loading') {
-    return (
-      <Centred>
-        <DS.Spinner />
-        <span className="text-fg-neutral-secondary-100 typography-body-200-regular">Loading your health profile…</span>
-      </Centred>
-    )
-  }
+  useEffect(() => {
+    if (status === 'error') emit(MESSAGE.ERROR, { message: error?.message ?? 'Could not resolve payload' })
+  }, [status, error])
 
-  if (status === 'error') {
-    return (
-      <Centred>
-        <div className="typography-body-400-medium">We couldn&rsquo;t load your health data</div>
-        <div className="text-fg-neutral-secondary-100 typography-body-200-regular" style={{ lineHeight: 1.5 }}>
-          {error?.message ?? 'Something went wrong.'}
-        </div>
-        <DS.Button emphasis="secondary" appearance="neutral" size="sm" onClick={reload}>
-          Try again
-        </DS.Button>
-      </Centred>
-    )
-  }
-
-  return children
+  return status === 'ready' ? children : null
 }
 
 export default function App() {
@@ -54,6 +52,7 @@ export default function App() {
     <DS.MantineProvider theme={DS.dsSyncMantineTheme}>
       <CoverageProvider>
         <BrowserRouter>
+          <ScrollToTop />
           <PayloadGate>
             <Routes>
               <Route path="/" element={<BridgePage />} />

@@ -431,3 +431,110 @@ html[data-embedded='1'] .shell {
   opacity: 1;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
 }
+
+/* ---------- Refresh: coverage callback ---------- */
+
+.callbackrow {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+@container (max-width: 1040px) {
+  .callbackrow {
+    gap: 14px;
+  }
+}
+
+/* ---------- Refresh: at-home draw add-on ---------- */
+
+/* Revealed once the plan is selected. Animating grid-template-rows from 0fr to
+   1fr transitions to the row's natural height without hardcoding one. */
+.athome {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  transition: grid-template-rows 0.28s ease, opacity 0.2s ease;
+}
+.athome > div {
+  overflow: hidden;
+}
+.athome[data-open='1'] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.athome-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  border-top-width: 1px;
+  border-top-style: solid;
+  cursor: pointer;
+}
+.athome-row:hover {
+  background: var(--ds-color-bg-neutral-tertiary-200);
+}
+
+@container (max-width: 1040px) {
+  .athome-row {
+    padding: 14px 16px;
+    gap: 12px;
+  }
+}
+
+/* ---------- Refresh: mobile sticky summary ---------- */
+
+/* Desktop keeps the sticky summary column, so the bar is narrow-layout only. */
+.mobilebar {
+  display: none;
+}
+
+@container (max-width: 1040px) {
+  .mobilebar {
+    display: block;
+    position: sticky;
+    bottom: 0;
+    z-index: 40;
+    margin: 0 -16px -40px;
+    padding: 0 16px 12px;
+    border-top-width: 1px;
+    border-top-style: solid;
+  }
+  .mobilebar-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 0 10px;
+  }
+  .mobilebar-toggle {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+  .mobilebar-cta button {
+    width: 100%;
+  }
+  .mobilebar-sheet {
+    max-height: 42vh;
+    overflow-y: auto;
+    padding-bottom: 4px;
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .athome {
+    transition: none;
+  }
+}

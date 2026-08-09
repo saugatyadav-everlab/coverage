@@ -4,10 +4,14 @@ import { useNavigate } from 'react-router-dom'
 import { DS } from '../ds/loadDs'
 import { PageShell } from '../components/PageShell'
 import { ProductCard } from '../components/ProductCard'
+import { AtHomeAddOn } from '../components/AtHomeAddOn'
+import { CoverageCallback } from '../components/CoverageHero'
+import { MobileSummaryBar, mobileBarVariant } from '../components/MobileSummaryBar'
 import { SummaryRing } from '../components/charts'
 import { BasketIcon, CheckIcon } from '../components/icons'
 import { useCoverage } from '../data/CoverageProvider'
 import { computeSelection } from '../data/products'
+import { AT_HOME } from '../data/atHome'
 import { MESSAGE, emit } from '../data/host'
 import { formatMoney } from '../data/format'
 
@@ -24,14 +28,19 @@ function withPricing(product, isMember, money) {
   return { ...product, priceToShow, priceSubtitle }
 }
 
-function SummaryPanel({ selection, membership, money, onCheckout, checkoutLabel }) {
-  const { refreshed, outdatedTotal, fraction, chosen, paid, isMember, subtotal, saved, total, anySelected } = selection
-
-  const lines = [
+export function summaryLines(selection, membership, money) {
+  const { chosen, paid, isMember, atHomeCharged } = selection
+  return [
     ...(isMember && membership ? [{ key: 'membership', name: membership.name, price: money(membership.price), paid: false }] : []),
+    ...(atHomeCharged ? [{ key: AT_HOME.id, name: AT_HOME.summaryName, price: money(AT_HOME.price), paid: false }] : []),
     ...chosen.map((product) => ({ key: product.id, name: product.name, price: money(selection.priceOf(product)), paid: false })),
     ...paid.map((product) => ({ key: product.id, name: product.name, price: 'Paid', paid: true })),
   ]
+}
+
+function SummaryPanel({ selection, membership, money, onCheckout, checkoutLabel }) {
+  const { refreshed, outdatedTotal, fraction, paid, subtotal, saved, total, anySelected } = selection
+  const lines = summaryLines(selection, membership, money)
 
   return (
     <div className="side">
@@ -140,7 +149,9 @@ export default function RefreshPage() {
   const { membership, products, outdated } = catalogue
 
   const [membershipSelected, setMembershipSelected] = useState(false)
+  const [atHomeSelected, setAtHomeSelected] = useState(false)
   const [selectedIds, setSelectedIds] = useState([])
+  const barVariant = mobileBarVariant()
 
   const money = useMemo(
     () => (amount) => formatMoney(amount, { currency: payload.currency, locale: payload.locale }),
@@ -148,9 +159,26 @@ export default function RefreshPage() {
   )
 
   const selection = useMemo(
-    () => computeSelection({ membership, products, outdated, selectedIds, membershipSelected }),
-    [membership, products, outdated, selectedIds, membershipSelected],
+    () =>
+      computeSelection({
+        membership,
+        products,
+        outdated,
+        selectedIds,
+        membershipSelected,
+        atHome: AT_HOME,
+        atHomeSelected,
+      }),
+    [membership, products, outdated, selectedIds, membershipSelected, atHomeSelected],
   )
+
+  // Dropping the plan drops its add-on with it, so re-selecting the plan never
+  // silently re-adds a charge the member last saw attached to something else.
+  const toggleMembership = () =>
+    setMembershipSelected((on) => {
+      if (on) setAtHomeSelected(false)
+      return !on
+    })
 
   const toggleProduct = (id) =>
     setSelectedIds((current) => (current.includes(id) ? current.filter((x) => x !== id) : [...current, id]))
@@ -163,6 +191,7 @@ export default function RefreshPage() {
     emit(MESSAGE.CHECKOUT, {
       selection: {
         membership: membershipSelected ? { id: membership?.id, name: membership?.name, price: membership?.price } : null,
+        atHome: selection.atHomeCharged ? { id: AT_HOME.id, name: AT_HOME.name, price: AT_HOME.price } : null,
         productIds: selection.chosen.map((product) => product.id),
         products: selection.chosen.map((product) => ({
           id: product.id,
@@ -213,8 +242,11 @@ export default function RefreshPage() {
     >
       <div className="page page--refresh">
         <div style={{ maxWidth: 1180, margin: '0 auto' }}>
-          <div style={{ padding: '30px 0 26px' }}>
+          <div style={{ padding: '30px 0 26px', display: 'flex', flexDirection: 'column', gap: 18 }}>
             <div className="pagetitle typography-display-300">Refresh your health data</div>
+            {/* Same sentence as the Bridge hero, so the gap the member just saw
+                is still on screen while they choose what to do about it. */}
+            <CoverageCallback profile={payload.profile} />
           </div>
 
           <div className="cols">
@@ -227,8 +259,16 @@ export default function RefreshPage() {
                       product={membershipCard}
                       outdatedTotal={selection.outdatedTotal}
                       selected={membershipSelected}
-                      onToggle={() => setMembershipSelected((on) => !on)}
+                      onToggle={toggleMembership}
                       money={money}
+                      footerExtra={
+                        <AtHomeAddOn
+                          open={membershipSelected}
+                          selected={atHomeSelected}
+                          onToggle={() => setAtHomeSelected((on) => !on)}
+                          money={money}
+                        />
+                      }
                     />
                   )}
                   {recommended.map(renderCard)}
@@ -251,6 +291,14 @@ export default function RefreshPage() {
               checkoutLabel="Continue to checkout"
             />
           </div>
+
+          <MobileSummaryBar
+            variant={barVariant}
+            selection={selection}
+            lines={summaryLines(selection, membershipCard, money)}
+            money={money}
+            onCheckout={handleCheckout}
+          />
         </div>
       </div>
     </PageShell>
