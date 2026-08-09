@@ -1,0 +1,5 @@
+@font-face{font-family:Saans;src:local(Saans Regular),local(Saans-Regular),url(./SaansRegular.woff2)format("woff2"),url(./SaansRegular.woff)format("woff");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:Saans Mono;src:local(Saans Mono Regular),local(SaansMono-Regular),url(./SaansMonoRegular.woff2)format("woff2"),url(./SaansMonoRegular.woff)format("woff");font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:Saans;src:local(Saans Medium),local(Saans-Medium),url(./SaansMedium.woff2)format("woff2"),url(./SaansMedium.woff)format("woff");font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:Saans;src:local(Saans Medium),local(Saans-Medium),url(./SaansMedium.woff2)format("woff2"),url(./SaansMedium.woff)format("woff");font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:Tobias;src:local(Tobias Regular),local(Tobias-Regular),url(./TobiasRegular.woff2)format("woff2"),url(./TobiasRegular.woff)format("woff");font-weight:400;font-style:normal;font-display:swap}

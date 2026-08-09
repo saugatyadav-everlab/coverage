@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Test console · Everlab Coverage</title>
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      body { font: 13px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; margin: 0; background: #0d0d0f; color: #ddd;
+             display: grid; grid-template-columns: 440px minmax(0, 1fr); height: 100vh; }
+      aside { border-right: 1px solid #26262b; display: flex; flex-direction: column; min-height: 0; }
+      h1 { font-size: 13px; margin: 0; padding: 12px 14px; border-bottom: 1px solid #26262b; letter-spacing: .04em; text-transform: uppercase; color: #8a8a94; }
+      .row { display: flex; gap: 6px; flex-wrap: wrap; padding: 10px 14px; border-bottom: 1px solid #26262b; }
+      label { color: #8a8a94; align-self: center; margin-right: 2px; }
+      button, select { font: inherit; padding: 5px 10px; border-radius: 5px; border: 1px solid #35353d; background: #1a1a1f; color: #ddd; cursor: pointer; }
+      button:hover, select:hover { background: #26262d; }
+      button.primary { background: #2d5bd7; border-color: #2d5bd7; color: #fff; }
+      textarea { flex: 1; min-height: 0; width: 100%; resize: none; border: 0; padding: 12px 14px;
+                 background: #0d0d0f; color: #b9d5ff; font: inherit; outline: none; }
+      #log { height: 190px; overflow: auto; padding: 10px 14px; border-top: 1px solid #26262b; background: #08080a; color: #7f8fa6; white-space: pre-wrap; word-break: break-all; }
+      #log b { color: #6ee7a8; font-weight: normal; }
+      main { display: flex; flex-direction: column; min-width: 0; }
+      iframe { flex: 1; width: 100%; border: 0; background: #000; }
+      .bad { color: #ff8080; }
+      .size { color: #8a8a94; align-self: center; margin-left: auto; }
+    </style>
+  </head>
+  <body>
+    <aside>
+      <h1>Payload</h1>
+
+      <div class="row">
+        <label>Scenario</label>
+        <select id="preset"></select>
+        <button id="send" class="primary">Send &#8594;</button>
+      </div>
+
+      <div class="row">
+        <button id="reload">Reload frame</button>
+        <button id="bridge">Bridge</button>
+        <button id="refresh">Refresh</button>
+        <button id="theme">Theme</button>
+        <button id="asurl">Open as ?d= URL</button>
+        <button id="tests">Run tests</button>
+        <span class="size" id="size"></span>
+      </div>
+
+      <textarea id="editor" spellcheck="false"></textarea>
+      <div id="log"></div>
+    </aside>
+
+    <main>
+      <iframe id="frame" src="/" title="Everlab coverage"></iframe>
+    </main>
+
+    <script type="module">
+      /**
+       * Test console for the coverage pages.
+       *
+       * The left pane is the payload your app would post in; edit it and hit
+       * Send to see the pages re-render. Everything below the `handlers` block
+       * is exactly what a host integration needs — the rest is test scaffolding.
+       */
+      import { PAYLOAD } from '/embed-example-payload.js'
+
+      const $ = (id) => document.getElementById(id)
+      const frame = $('frame')
+      const editor = $('editor')
+      const log = $('log')
+
+      const write = (line, good) =>
+        (log.innerHTML = `${new Date().toLocaleTimeString()}  ${good ? `<b>${line}</b>` : line}\n${log.innerHTML}`)
+
+      // ---------------------------------------------------------------- scenarios
+
+      const clone = (o) => JSON.parse(JSON.stringify(o))
+
+      const allCurrent = () => {
+        const p = clone(PAYLOAD)
+        p.profile.bioAgeKnown = true
+        p.panels.forEach((panel) => {
+          panel.markers = { current: [...panel.markers.outdated, ...panel.markers.never, ...panel.markers.current] }
+        })
+        p.atRisk = []
+        return p
+      }
+
+      const noProducts = () => {
+        const p = clone(PAYLOAD)
+        delete p.membership
+        p.products = []
+        return p
+      }
+
+      const bigProfile = () => {
+        const p = clone(PAYLOAD)
+        p.panels = Array.from({ length: 24 }, (_, i) => ({
+          id: `panel-${i}`,
+          name: `Panel ${i + 1}`,
+          lastTested: '2024-11-02',
+          markers: {
+            outdated: Array.from({ length: 12 }, (_, j) => `Panel ${i + 1} marker ${j + 1}`),
+            never: [`Panel ${i + 1} novel marker`],
+            current: Array.from({ length: 7 }, (_, j) => `Panel ${i + 1} stable ${j + 1}`),
+          },
+        }))
+        p.profile.tracked = 24 * 20
+        return p
+      }
+
+      const noContribution = () => {
+        const p = clone(PAYLOAD)
+        // Every item is a first-time test: recommended, but nothing comes off
+        // the outdated pile. The summary ring should stay empty.
+        p.products = p.products.map((item) => ({ ...item, contributesToProgress: false, recommended: true }))
+        delete p.membership
+        return p
+      }
+
+      const PRESETS = {
+        'Default (3 panels, mixed items)': () => clone(PAYLOAD),
+        'Everything up to date': allCurrent,
+        'No products on Refresh': noProducts,
+        'Only non-contributing items': noContribution,
+        'Large profile (24 panels, 480 markers)': bigProfile,
+      }
+
+      const preset = $('preset')
+      for (const name of Object.keys(PRESETS)) preset.append(new Option(name, name))
+
+      const loadPreset = () => {
+        editor.value = JSON.stringify(PRESETS[preset.value](), null, 2)
+        updateSize()
+      }
+
+      // ------------------------------------------------------------ URL encoding
+
+      const toBase64Url = (bytes) => {
+        let binary = ''
+        for (const byte of bytes) binary += String.fromCharCode(byte)
+        return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+      }
+
+      async function encode(payload) {
+        const bytes = new TextEncoder().encode(JSON.stringify(payload))
+        const stream = new Blob([bytes]).stream().pipeThrough(new CompressionStream('gzip'))
+        return toBase64Url(new Uint8Array(await new Response(stream).arrayBuffer()))
+      }
+
+      async function updateSize() {
+        try {
+          const payload = JSON.parse(editor.value)
+          const encoded = await encode(payload)
+          const kb = (n) => `${(n / 1024).toFixed(1)}KB`
+          $('size').textContent = `json ${kb(editor.value.length)} · ?d= ${kb(encoded.length)}`
+          $('size').className = encoded.length > 7000 ? 'size bad' : 'size'
+        } catch {
+          $('size').textContent = 'invalid JSON'
+          $('size').className = 'size bad'
+        }
+      }
+
+      // ------------------------------------------------------- the host integration
+
+      let payload = null
+
+      function send() {
+        try {
+          payload = JSON.parse(editor.value)
+        } catch (error) {
+          write(`invalid JSON: ${error.message}`)
+          return
+        }
+        frame.contentWindow.postMessage({ type: 'everlab:coverage:data', payload }, '*')
+      }
+
+      window.addEventListener('message', (event) => {
+        if (event.source !== frame.contentWindow) return
+        const data = event.data
+        if (!data?.type?.startsWith?.('everlab:')) return
+
+        switch (data.type) {
+          case 'everlab:coverage:ready':
+            write('frame ready → sending payload')
+            send()
+            break
+
+          case 'everlab:coverage:resize':
+            // Size the iframe to its content so there's no nested scrollbar.
+            // (This console keeps a fixed-height frame, so it just logs.)
+            break
+
+          case 'everlab:coverage:close':
+            write('close requested — dismiss your overlay here')
+            break
+
+          case 'everlab:refresh:checkout':
+            // >>> This is where YOUR checkout modal opens. <<<
+            write(`checkout → ${JSON.stringify(data.totals)}`, true)
+            write(`  coverage ${JSON.stringify(data.coverage)}`)
+            write(`  items ${JSON.stringify(data.selection)}`)
+            break
+
+          default:
+            write(data.type)
+        }
+      })
+
+      // ----------------------------------------------------------------- controls
+
+      const go = (path) => {
+        frame.src = path
+      }
+
+      preset.onchange = loadPreset
+      editor.oninput = updateSize
+      $('send').onclick = send
+      $('reload').onclick = () => go(frame.contentWindow.location.pathname)
+      $('bridge').onclick = () => go('/')
+      $('refresh').onclick = () => go('/refresh')
+
+      $('theme').onclick = () => {
+        const theme = frame.dataset.theme === 'dark' ? 'light' : 'dark'
+        frame.dataset.theme = theme
+        frame.contentWindow.postMessage({ type: 'everlab:coverage:theme', theme }, '*')
+        write(`theme → ${theme}`)
+      }
+
+      // Pricing + contribution assertions, run against the real modules.
+      // Dev only — src/ isn't served by the production build.
+      $('tests').onclick = async () => {
+        try {
+          const { run } = await import(`/src/data/products.test.js?t=${Date.now()}`)
+          const result = run()
+          for (const check of result.results.filter((r) => !r.ok)) {
+            write(`FAIL  ${check.name}`)
+            for (const failure of check.failures) write(`        ${failure}`)
+          }
+          write(`${result.passed}/${result.total} pricing tests passed`, result.ok)
+        } catch (error) {
+          write(`tests unavailable (dev server only): ${error.message}`)
+        }
+      }
+
+      $('asurl').onclick = async () => {
+        const encoded = await encode(JSON.parse(editor.value))
+        const url = `${location.origin}/?d=${encoded}`
+        if (url.length > 8192) write(`warning: URL is ${url.length} bytes — use postMessage instead`)
+        window.open(url, '_blank')
+      }
+
+      loadPreset()
+    </script>
+  </body>
+</html>

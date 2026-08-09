@@ -1,0 +1,3 @@
+# SPA fallback: /refresh (and any deep link) must serve index.html.
+# Real files under /ds and /assets are matched before this rule.
+/*  /index.html  200

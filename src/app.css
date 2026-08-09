@@ -1,0 +1,433 @@
+/* Layout CSS ported from the design comps.
+   Colour, type and radius all come from the design system's token classes
+   (bg-bg-*, text-fg-*, border-br-*, typography-*, rounded-*) — this file only
+   carries structure the tokens can't express: grids, container queries and the
+   handful of one-off decorations. */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Saans', system-ui, sans-serif;
+  background: var(--ds-color-bg-neutral-primary-invert-100);
+  color: var(--ds-color-fg-neutral-primary-100);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--ds-color-fg-neutral-primary-100);
+  text-decoration: none;
+}
+a:hover {
+  opacity: 0.8;
+}
+
+/* The shell is the container-query root, so breakpoints follow the embedded
+   iframe's width rather than the outer window's. */
+.shell {
+  container-type: inline-size;
+  margin: 0 auto;
+  min-height: 100vh;
+  transition: width 0.18s ease;
+}
+
+/* Set while we're auto-sizing an embedding iframe — see host.js/observeHeight. */
+html[data-embedded='1'] .shell {
+  min-height: 0;
+}
+
+.top {
+  padding: 22px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+.top svg {
+  height: 22px;
+  width: auto;
+  display: block;
+}
+
+.page {
+  padding: 0 40px 120px;
+}
+.page--refresh {
+  padding: 0 40px 80px;
+}
+
+.foot {
+  padding: 18px 40px 20px;
+}
+
+/* ---------- Bridge ---------- */
+
+.statgrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.herorow {
+  display: flex;
+  align-items: center;
+  gap: 34px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+.legcol {
+  flex: 1;
+  min-width: 300px;
+  display: flex;
+  flex-direction: column;
+}
+.legrow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 84px 116px;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom-style: solid;
+  border-bottom-color: rgba(255, 255, 255, 0.16);
+}
+
+.mkgrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px 22px;
+}
+
+.prow {
+  cursor: pointer;
+  transition: background 0.14s ease;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+.prow:hover {
+  background: var(--ds-color-bg-neutral-tertiary-200);
+}
+.prowin {
+  padding: 16px 18px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.riskrow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) 110px 130px 150px 120px;
+  gap: 20px;
+  align-items: center;
+  padding: 18px 4px;
+  border-bottom-style: solid;
+}
+.rmeta {
+  display: contents;
+}
+.rsep {
+  display: none;
+}
+
+.tipbub {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.12s ease;
+}
+.tipwrap:hover .tipbub,
+.tipwrap:focus-within .tipbub {
+  opacity: 1;
+  visibility: visible;
+}
+
+@container (max-width: 860px) {
+  .top {
+    padding: 14px 16px;
+  }
+  .page {
+    padding: 0 16px 108px;
+  }
+  .pagetitle {
+    font-size: 22px;
+    line-height: 1.2;
+  }
+  .seclabel {
+    font-size: 18px;
+  }
+  .foot {
+    padding: 14px 18px 16px;
+  }
+  .statgrid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  .herorow {
+    gap: 20px;
+  }
+  .legcol {
+    min-width: 0;
+    width: 100%;
+  }
+  .legrow {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 6px 14px;
+    padding: 13px 0;
+  }
+  .legrow > :nth-child(2) {
+    display: none;
+  }
+  .mkgrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 2px 14px;
+  }
+  .statval {
+    font-size: 18px;
+  }
+  .pname {
+    font-size: 14px;
+  }
+  .herotitle {
+    font-size: 18px;
+  }
+  .footin {
+    gap: 14px;
+  }
+  .footcta {
+    flex: 1 0 100%;
+    width: 100%;
+  }
+  .footcta button {
+    width: 100%;
+  }
+  .prowin {
+    padding: 14px;
+    gap: 12px;
+  }
+  .riskrow {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'name range'
+      'meta badge';
+    gap: 6px 14px;
+    align-items: center;
+    padding: 16px 2px;
+  }
+  .rname {
+    grid-area: name;
+  }
+  .rmeta {
+    grid-area: meta;
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    min-width: 0;
+  }
+  .rsep {
+    display: inline;
+  }
+  .rrange {
+    grid-area: range;
+    justify-content: flex-end;
+    align-self: end;
+  }
+  .rbadge {
+    grid-area: badge;
+  }
+}
+
+/* ---------- Refresh ---------- */
+
+.cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 400px;
+  gap: 48px;
+  align-items: start;
+}
+.side {
+  position: sticky;
+  top: 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  cursor: pointer;
+  border-width: 1px;
+  border-style: solid;
+  transition: border-color 0.14s ease, box-shadow 0.14s ease;
+  width: 100%;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  display: block;
+}
+.card[data-on='1'] {
+  box-shadow: inset 0 0 0 1px currentColor;
+}
+.card:hover {
+  border-color: var(--ds-color-br-neutral-secondary-100);
+}
+
+.chead {
+  padding: 20px 20px 0;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: 'tile meta check';
+  align-items: center;
+  gap: 18px;
+}
+.cmeta {
+  grid-area: meta;
+  min-width: 0;
+}
+.cbox {
+  grid-area: check;
+  justify-self: end;
+  align-self: start;
+}
+.mtile {
+  grid-area: tile;
+  justify-self: start;
+  height: 64px;
+  aspect-ratio: 1.75;
+}
+.atile {
+  grid-area: tile;
+  justify-self: start;
+  width: 64px;
+  height: 64px;
+  overflow: hidden;
+}
+
+.cfoot {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: 'ring markers price';
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  border-top-width: 1px;
+  border-top-style: solid;
+}
+.cring {
+  grid-area: ring;
+  display: flex;
+}
+.cmk {
+  grid-area: markers;
+  min-width: 0;
+}
+.cfr {
+  grid-area: price;
+  text-align: right;
+}
+.cdiv {
+  display: none;
+}
+.addbtn {
+  display: none;
+  grid-area: add;
+  justify-self: end;
+}
+
+.sumitem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom-style: solid;
+  border-bottom-width: 1px;
+}
+
+@container (max-width: 1040px) {
+  .page--refresh {
+    padding: 0 16px 40px;
+  }
+  .cols {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+  .side {
+    position: static;
+    gap: 12px;
+  }
+  .chead {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      'tile check'
+      'meta meta';
+    align-items: start;
+    gap: 14px;
+    padding: 16px 16px 0;
+  }
+  .mtile {
+    height: 56px;
+  }
+  .atile {
+    width: 58px;
+    height: 58px;
+  }
+  .cfoot {
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    grid-template-areas:
+      'ring markers markers'
+      'div div div'
+      'price price add';
+    gap: 0 14px;
+    padding: 12px 16px 14px;
+  }
+  .cfoot .cring svg {
+    width: 34px;
+    height: 34px;
+  }
+  .cdiv {
+    display: block;
+    grid-area: div;
+    height: 0;
+    margin: 12px 0;
+    border-top-width: 1px;
+    border-top-style: solid;
+  }
+  .cfr {
+    justify-self: start;
+    text-align: left;
+  }
+  .addbtn {
+    display: flex;
+  }
+}
+
+/* ---------- Preview-only viewport switcher (?preview=1) ---------- */
+
+.vpbtn {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 60;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(128, 128, 128, 0.16);
+  backdrop-filter: blur(8px);
+}
+.vpbtn button {
+  border: 0;
+  cursor: pointer;
+  font-family: 'Saans', system-ui;
+  font-size: 12px;
+  padding: 6px 13px;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  opacity: 0.6;
+}
+.vpbtn button[data-on='1'] {
+  background: var(--ds-color-bg-neutral-primary-invert-100);
+  opacity: 1;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+}
