@@ -249,7 +249,6 @@ export default function RefreshPage() {
             <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
               {(membershipCard || recommended.length > 0) && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  <div className="seclabel typography-body-400-medium">Recommended</div>
                   {membershipCard && (
                     <ProductCard
                       product={membershipCard}
