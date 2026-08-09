@@ -243,7 +243,7 @@ export default function RefreshPage() {
       <div className="page page--refresh">
         <div style={{ maxWidth: 1180, margin: '0 auto' }}>
           <div style={{ padding: '30px 0 26px', display: 'flex', flexDirection: 'column', gap: 18 }}>
-            <div className="pagetitle typography-display-300">Refresh your health data</div>
+            <div className="pagetitle typography-display-300">Refresh your outdated biomarkers</div>
             {/* Same sentence as the Bridge hero, so the gap the member just saw
                 is still on screen while they choose what to do about it. */}
             <CoverageCallback profile={payload.profile} />
