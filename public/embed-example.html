@@ -63,7 +63,7 @@
        * Send to see the pages re-render. Everything below the `handlers` block
        * is exactly what a host integration needs — the rest is test scaffolding.
        */
-      import { PAYLOAD } from '/embed-example-payload.js'
+      import { PROFILES } from '/embed-example-payload.js'
 
       const $ = (id) => document.getElementById(id)
       const frame = $('frame')
@@ -76,56 +76,9 @@
       // ---------------------------------------------------------------- scenarios
 
       const clone = (o) => JSON.parse(JSON.stringify(o))
-
-      const allCurrent = () => {
-        const p = clone(PAYLOAD)
-        p.profile.bioAgeKnown = true
-        p.panels.forEach((panel) => {
-          panel.markers = { current: [...panel.markers.outdated, ...panel.markers.never, ...panel.markers.current] }
-        })
-        p.atRisk = []
-        return p
-      }
-
-      const noProducts = () => {
-        const p = clone(PAYLOAD)
-        delete p.membership
-        p.products = []
-        return p
-      }
-
-      const bigProfile = () => {
-        const p = clone(PAYLOAD)
-        p.panels = Array.from({ length: 24 }, (_, i) => ({
-          id: `panel-${i}`,
-          name: `Panel ${i + 1}`,
-          lastTested: '2024-11-02',
-          markers: {
-            outdated: Array.from({ length: 12 }, (_, j) => `Panel ${i + 1} marker ${j + 1}`),
-            never: [`Panel ${i + 1} novel marker`],
-            current: Array.from({ length: 7 }, (_, j) => `Panel ${i + 1} stable ${j + 1}`),
-          },
-        }))
-        p.profile.tracked = 24 * 20
-        return p
-      }
-
-      const noContribution = () => {
-        const p = clone(PAYLOAD)
-        // Every item is a first-time test: recommended, but nothing comes off
-        // the outdated pile. The summary ring should stay empty.
-        p.products = p.products.map((item) => ({ ...item, contributesToProgress: false, recommended: true }))
-        delete p.membership
-        return p
-      }
-
-      const PRESETS = {
-        'Default (3 panels, mixed items)': () => clone(PAYLOAD),
-        'Everything up to date': allCurrent,
-        'No products on Refresh': noProducts,
-        'Only non-contributing items': noContribution,
-        'Large profile (24 panels, 480 markers)': bigProfile,
-      }
+      const PRESETS = Object.fromEntries(
+        Object.entries(PROFILES).map(([name, payload]) => [name, () => clone(payload)]),
+      )
 
       const preset = $('preset')
       for (const name of Object.keys(PRESETS)) preset.append(new Option(name, name))
