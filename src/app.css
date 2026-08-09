@@ -499,18 +499,15 @@ html[data-embedded='1'] .shell {
     border-top-width: 1px;
     border-top-style: solid;
   }
+  /* The card carries its own border and padding, so the bar only supplies the
+     sticky frame around it. */
   .mobilebar-row {
-    display: flex;
-    align-items: center;
-    gap: 14px;
     padding: 12px 0 10px;
   }
   .mobilebar-toggle {
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    gap: 14px;
+    position: relative;
+    display: block;
+    width: 100%;
     border: 0;
     padding: 0;
     background: transparent;
@@ -519,15 +516,26 @@ html[data-embedded='1'] .shell {
     text-align: left;
     cursor: pointer;
   }
+  .mobilebar-chevron {
+    position: absolute;
+    top: 50%;
+    right: 18px;
+    display: flex;
+  }
+  /* Leave room for the chevron so it never sits on the label. */
+  .mobilebar-toggle .typography-body-200-regular {
+    padding-right: 22px;
+  }
   .mobilebar-cta button {
     width: 100%;
   }
   .mobilebar-sheet {
-    max-height: 42vh;
+    max-height: 46vh;
     overflow-y: auto;
-    padding-bottom: 4px;
-    border-bottom-width: 1px;
-    border-bottom-style: solid;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 14px 0 2px;
   }
 }
 

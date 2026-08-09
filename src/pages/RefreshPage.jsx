@@ -6,8 +6,7 @@ import { PageShell } from '../components/PageShell'
 import { ProductCard } from '../components/ProductCard'
 import { AtHomeAddOn } from '../components/AtHomeAddOn'
 import { MobileSummaryBar, mobileBarVariant } from '../components/MobileSummaryBar'
-import { SummaryRing } from '../components/charts'
-import { BasketIcon, CheckIcon } from '../components/icons'
+import { CoverageSummaryCard, SummaryLineItems, TotalsCard } from '../components/SummaryParts'
 import { useCoverage } from '../data/CoverageProvider'
 import { computeSelection } from '../data/products'
 import { AT_HOME } from '../data/atHome'
@@ -38,104 +37,23 @@ export function summaryLines(selection, membership, money) {
 }
 
 function SummaryPanel({ selection, membership, money, onCheckout, checkoutLabel }) {
-  const { refreshed, outdatedTotal, fraction, subtotal, saved, total, anySelected } = selection
   const lines = summaryLines(selection, membership, money)
 
   return (
     <div className="side">
       <div className="seclabel typography-body-400-medium">Summary</div>
+      <CoverageSummaryCard selection={selection} />
+      <SummaryLineItems lines={lines} />
+      <TotalsCard selection={selection} money={money} />
 
-      <div
-        className="rounded-2xl border-br-neutral-tertiary-100"
-        style={{ borderWidth: 1, borderStyle: 'solid', padding: 18, display: 'flex', alignItems: 'center', gap: 16 }}
+      <DS.Button
+        emphasis="primary"
+        appearance="neutral"
+        size="lg"
+        disabled={!selection.anySelected}
+        onClick={onCheckout}
+        className="w-full"
       >
-        <SummaryRing fraction={fraction} label={`${refreshed} of ${outdatedTotal} outdated biomarkers refreshed`} />
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div className="typography-display-100">{refreshed}</div>
-          <div className="text-fg-neutral-secondary-100 typography-body-200-regular" style={{ marginTop: 3, lineHeight: 1.4 }}>
-            Outdated biomarkers being refreshed
-          </div>
-        </div>
-      </div>
-
-      {lines.length > 0 && (
-        <div style={{ display: 'flex', flexDirection: 'column', marginTop: 4 }}>
-          {lines.map((line, index) => (
-            <div key={line.key} className="sumitem border-br-neutral-tertiary-100" style={{ borderBottomWidth: index === lines.length - 1 ? 0 : 1 }}>
-              <span className="bg-bg-neutral-primary-100" style={{ flex: 'none', width: 6, height: 6 }} />
-              <span className="typography-body-200-regular" style={{ flex: 1, minWidth: 0, lineHeight: 1.4 }}>
-                {line.name}
-              </span>
-              <span
-                className={`${line.paid ? 'text-fg-range-optimal-primary-100' : ''} typography-body-200-regular`}
-                style={{ flex: 'none', display: 'flex', alignItems: 'center', gap: 6 }}
-              >
-                {line.paid && <CheckIcon size={13} />}
-                {line.price}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {lines.length === 0 && (
-        <div style={{ padding: '22px 10px 6px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-          <span
-            className="bg-bg-neutral-tertiary-100 text-fg-neutral-primary-100"
-            style={{ flex: 'none', width: 44, height: 44, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-          >
-            <BasketIcon />
-          </span>
-          <div>
-            <div className="typography-body-300-medium">Nothing selected yet.</div>
-            <div className="text-fg-neutral-secondary-100 typography-body-200-regular" style={{ marginTop: 6, lineHeight: 1.5 }}>
-              As you add items, you can see how much they contribute to refreshing your outdated biomarkers.
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="rounded-2xl bg-bg-neutral-tertiary-100" style={{ padding: 18, display: 'flex', flexDirection: 'column', gap: 14 }}>
-        <div style={{ display: 'flex', alignItems: 'baseline', gap: 12 }}>
-          <span className="typography-body-200-regular" style={{ flex: 1 }}>
-            Subtotal
-          </span>
-          <span className="typography-body-200-regular" style={{ flex: 'none' }}>
-            {money(subtotal)}
-          </span>
-        </div>
-
-        {saved > 0 && (
-          <div
-            className="border-br-neutral-tertiary-100"
-            style={{ display: 'flex', alignItems: 'baseline', gap: 12, paddingTop: 14, borderTopWidth: 1, borderTopStyle: 'solid' }}
-          >
-            <span className="typography-body-200-regular" style={{ flex: 1 }}>
-              Member discount
-            </span>
-            <span className="text-fg-range-optimal-primary-100 typography-body-200-regular" style={{ flex: 'none' }}>
-              -{money(saved)}
-            </span>
-          </div>
-        )}
-
-        <div
-          className="border-br-neutral-tertiary-100"
-          style={{ display: 'flex', alignItems: 'baseline', gap: 12, paddingTop: 14, borderTopWidth: 1, borderTopStyle: 'solid' }}
-        >
-          <div style={{ flex: 1 }}>
-            <div className="typography-body-400-medium">Total</div>
-            <div className="text-fg-neutral-tertiary-100 typography-body-100-regular" style={{ marginTop: 2 }}>
-              (GST inc.)
-            </div>
-          </div>
-          <span className="typography-body-500-medium" style={{ flex: 'none' }}>
-            {money(total)}
-          </span>
-        </div>
-      </div>
-
-      <DS.Button emphasis="primary" appearance="neutral" size="lg" disabled={!anySelected} onClick={onCheckout} className="w-full">
         {checkoutLabel}
       </DS.Button>
     </div>
