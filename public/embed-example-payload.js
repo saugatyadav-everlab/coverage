@@ -245,7 +245,8 @@ export const PROFILES = {
     never: 4,
     bioAgeKnown: false,
     membershipMarkers: 40,
-    products: [VO2, DEXA],
+    // Simplest case: nothing prepaid, nothing non-contributing.
+    products: [DEXA, HORMONE],
   }),
 
   'Medium — 88 markers to refresh': profile({
@@ -257,6 +258,7 @@ export const PROFILES = {
     never: 6,
     bioAgeKnown: false,
     membershipMarkers: 55,
+    // Adds a prepaid item.
     products: [VO2, DEXA, HORMONE],
   }),
 
@@ -269,6 +271,7 @@ export const PROFILES = {
     never: 8,
     bioAgeKnown: false,
     membershipMarkers: 80,
+    // Adds a recommended item that contributes nothing to the outdated pile.
     products: [VO2, DEXA, HORMONE, METALS, CALCIUM],
   }),
 }

@@ -15,6 +15,7 @@
 
 import { normalisePayload } from './schema'
 import { computeSelection, resolveProducts } from './products'
+import { summaryLines } from './summary'
 
 const BASE_PAYLOAD = {
   profile: { tracked: 20 },
@@ -156,6 +157,20 @@ const CASES = {
     expect(s.anySelected, false)
     expect(s.paid.length, 1)
     expect(s.total, 0)
+  },
+
+  'prepaid items head the summary so new selections append below them'() {
+    const s = select({ ids: ['discounted', 'flat'], member: true, atHome: true })
+    const names = summaryLines(s, s.membership, (n) => `$${n}`).map((l) => l.name)
+
+    expect(names[0], 'Already paid', 'the settled item is anchored at the top')
+    expect(names, [
+      'Already paid',
+      'Baseline',
+      'At-home pathology',
+      'Discounted add-on',
+      'No member price',
+    ])
   },
 
   'the at-home draw is charged but never moves the coverage ring'() {

@@ -10,6 +10,7 @@ import { CoverageSummaryCard, SummaryLineItems, TotalsCard } from '../components
 import { useCoverage } from '../data/CoverageProvider'
 import { computeSelection } from '../data/products'
 import { AT_HOME } from '../data/atHome'
+import { summaryLines } from '../data/summary'
 import { MESSAGE, emit } from '../data/host'
 import { formatMoney } from '../data/format'
 
@@ -24,16 +25,6 @@ function withPricing(product, isMember, money) {
   }
 
   return { ...product, priceToShow, priceSubtitle }
-}
-
-export function summaryLines(selection, membership, money) {
-  const { chosen, paid, isMember, atHomeCharged } = selection
-  return [
-    ...(isMember && membership ? [{ key: 'membership', name: membership.name, price: money(membership.price), paid: false }] : []),
-    ...(atHomeCharged ? [{ key: AT_HOME.id, name: AT_HOME.summaryName, price: money(AT_HOME.price), paid: false }] : []),
-    ...chosen.map((product) => ({ key: product.id, name: product.name, price: money(selection.priceOf(product)), paid: false })),
-    ...paid.map((product) => ({ key: product.id, name: product.name, price: 'Paid', paid: true })),
-  ]
 }
 
 function SummaryPanel({ selection, membership, money, onCheckout, checkoutLabel }) {
