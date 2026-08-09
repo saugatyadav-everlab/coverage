@@ -5,7 +5,6 @@ import { DS } from '../ds/loadDs'
 import { PageShell } from '../components/PageShell'
 import { ProductCard } from '../components/ProductCard'
 import { AtHomeAddOn } from '../components/AtHomeAddOn'
-import { CoverageCallback } from '../components/CoverageHero'
 import { MobileSummaryBar, mobileBarVariant } from '../components/MobileSummaryBar'
 import { SummaryRing } from '../components/charts'
 import { BasketIcon, CheckIcon } from '../components/icons'
@@ -242,11 +241,8 @@ export default function RefreshPage() {
     >
       <div className="page page--refresh">
         <div style={{ maxWidth: 1180, margin: '0 auto' }}>
-          <div style={{ padding: '30px 0 26px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+          <div style={{ padding: '30px 0 26px' }}>
             <div className="pagetitle typography-display-300">Refresh your outdated biomarkers</div>
-            {/* Same sentence as the Bridge hero, so the gap the member just saw
-                is still on screen while they choose what to do about it. */}
-            <CoverageCallback profile={payload.profile} />
           </div>
 
           <div className="cols">

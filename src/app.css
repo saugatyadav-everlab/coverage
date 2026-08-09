@@ -443,19 +443,6 @@ html[data-embedded='1'] .shell {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
 }
 
-/* ---------- Refresh: coverage callback ---------- */
-
-.callbackrow {
-  display: flex;
-  align-items: center;
-  gap: 18px;
-}
-@container (max-width: 1040px) {
-  .callbackrow {
-    gap: 14px;
-  }
-}
-
 /* ---------- Refresh: at-home draw add-on ---------- */
 
 /* Revealed once the plan is selected. Animating grid-template-rows from 0fr to
