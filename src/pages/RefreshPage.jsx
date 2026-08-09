@@ -42,20 +42,26 @@ function SummaryPanel({ selection, membership, money, onCheckout, checkoutLabel 
   return (
     <div className="side">
       <div className="seclabel typography-body-400-medium">Summary</div>
-      <CoverageSummaryCard selection={selection} />
+      {/* Both of these move into the sticky bar on narrow layouts — see app.css. */}
+      <div className="side-coverage">
+        <CoverageSummaryCard selection={selection} />
+      </div>
       <SummaryLineItems lines={lines} />
       <TotalsCard selection={selection} money={money} />
 
-      <DS.Button
-        emphasis="primary"
-        appearance="neutral"
-        size="lg"
-        disabled={!selection.anySelected}
-        onClick={onCheckout}
-        className="w-full"
-      >
-        {checkoutLabel}
-      </DS.Button>
+      {/* Wrapped rather than classed: DS.Button doesn't forward className. */}
+      <span className="side-cta" style={{ display: 'flex' }}>
+        <DS.Button
+          emphasis="primary"
+          appearance="neutral"
+          size="lg"
+          disabled={!selection.anySelected}
+          onClick={onCheckout}
+          className="w-full"
+        >
+          {checkoutLabel}
+        </DS.Button>
+      </span>
     </div>
   )
 }
@@ -158,7 +164,7 @@ export default function RefreshPage() {
       }}
     >
       <div className="page page--refresh">
-        <div style={{ maxWidth: 1180, margin: '0 auto' }}>
+        <div style={{ maxWidth: 1180, margin: '0 auto' }} data-mobilebar={barVariant}>
           <div style={{ padding: '30px 0 26px' }}>
             <div className="pagetitle typography-display-300">Refresh your outdated biomarkers</div>
           </div>

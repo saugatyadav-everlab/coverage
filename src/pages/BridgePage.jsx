@@ -28,10 +28,10 @@ export default function BridgePage() {
 
   const footer = (
     <div
-      className="foot border-br-neutral-tertiary-100 bg-bg-neutral-primary-invert-100 text-fg-neutral-primary-100"
+      className="foot foot--bridge border-br-neutral-tertiary-100 bg-bg-neutral-primary-invert-100 text-fg-neutral-primary-100"
       style={{ position: 'sticky', bottom: 0, borderTopWidth: 1, borderTopStyle: 'solid' }}
     >
-      <div className="footin" style={{ maxWidth: 800, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 22, flexWrap: 'wrap' }}>
+      <div className="footin">
         {/* Ring and text are their own group, so the footer's 22px gap only
             separates them from the CTA — the ring sits tight to its label. */}
         <div className="footlead">
