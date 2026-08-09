@@ -52,14 +52,24 @@ export function CoverageDial({ fraction, size = 96, label }) {
   )
 }
 
-/** Small neutral ring used on each Refresh product card. */
-export function ProgressRing({ fraction, size = 44 }) {
+/**
+ * Small neutral ring — Refresh product cards, and the Bridge footer.
+ * Pass `label` where it carries meaning on its own; without one it's decorative
+ * and hidden from assistive tech.
+ */
+export function ProgressRing({ fraction, size = 44, label }) {
   const centre = size / 2
   const radius = size * 0.38
   const band = 6
 
   return (
-    <svg viewBox={`0 0 ${size} ${size}`} style={{ width: size, height: size, display: 'block' }} aria-hidden="true">
+    <svg
+      viewBox={`0 0 ${size} ${size}`}
+      style={{ width: size, height: size, display: 'block' }}
+      role={label ? 'img' : undefined}
+      aria-label={label}
+      aria-hidden={label ? undefined : 'true'}
+    >
       {ticks({ centre, radius, band, count: 26, className: 'text-fg-neutral-tertiary-100', stroke: 'currentColor', strokeWidth: 1.2 })}
       {fraction > 0 && (
         <circle

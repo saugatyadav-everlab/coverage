@@ -59,6 +59,13 @@ html[data-embedded='1'] .shell {
 .foot {
   padding: 18px 40px 20px;
 }
+.footlead {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 
 /* ---------- Bridge ---------- */
 
@@ -197,6 +204,10 @@ html[data-embedded='1'] .shell {
   .footcta {
     flex: 1 0 100%;
     width: 100%;
+  }
+  /* The CTA takes its own row here; the ring stays paired with the text. */
+  .footlead {
+    min-width: 0;
   }
   .footcta button {
     width: 100%;

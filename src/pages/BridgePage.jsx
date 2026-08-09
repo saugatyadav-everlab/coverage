@@ -4,6 +4,7 @@ import { DS } from '../ds/loadDs'
 import { PageShell } from '../components/PageShell'
 import { StatCard } from '../components/StatCard'
 import { CoverageHero } from '../components/CoverageHero'
+import { ProgressRing } from '../components/charts'
 import { PanelAccordion } from '../components/PanelAccordion'
 import { AtRiskTable } from '../components/AtRiskTable'
 import { useCoverage } from '../data/CoverageProvider'
@@ -31,10 +32,25 @@ export default function BridgePage() {
       style={{ position: 'sticky', bottom: 0, borderTopWidth: 1, borderTopStyle: 'solid' }}
     >
       <div className="footin" style={{ maxWidth: 800, margin: '0 auto', display: 'flex', alignItems: 'center', gap: 22, flexWrap: 'wrap' }}>
-        <div style={{ flex: 1, minWidth: 220 }}>
-          <div className="typography-body-300-medium">Bring your data up to date</div>
-          <div className="text-fg-neutral-tertiary-100 typography-body-200-regular" style={{ marginTop: 4 }}>
-            Pick what to retest and see our recommendations.
+        {/* Ring and text are their own group, so the footer's 22px gap only
+            separates them from the CTA — the ring sits tight to its label. */}
+        <div className="footlead">
+          {/* Same fraction as the hero dial — the state being carried into the
+              next step. Neutral rather than the hero's white-on-brand, since
+              the footer sits on the page background. */}
+          <span className="footring" style={{ flex: 'none', display: 'flex' }}>
+            <ProgressRing
+              fraction={profile.tracked ? profile.valid / profile.tracked : 0}
+              size={40}
+              label={`${profile.valid} of ${profile.tracked} biomarkers still valid`}
+            />
+          </span>
+
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="typography-body-300-medium">Bring your data up to date</div>
+            <div className="text-fg-neutral-tertiary-100 typography-body-200-regular" style={{ marginTop: 4 }}>
+              Pick what to retest and see our recommendations.
+            </div>
           </div>
         </div>
         <span className="footcta" style={{ flex: 'none', display: 'flex' }}>
