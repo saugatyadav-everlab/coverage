@@ -21,116 +21,194 @@ function monthsBack(n) {
 }
 
 /**
- * Panel names are Everlab's official ones. Which markers sit under each is my
- * grouping, not a clinical mapping — correct it against the real panel
- * definitions before this gets shown as anything but layout.
+ * Everlab's real panels and the markers under each.
+ *
+ * A marker can legitimately appear in more than one panel — ALT sits under both
+ * Liver Function and Cancer Detection, Serum Ferritin under both Hormone Health
+ * and Iron Studies — so the totals here are per-panel, not a distinct set.
+ *
+ * Only some of these are used by the three presets; the rest are here to swap in.
  */
 const LIBRARY = {
   heart: {
     name: 'Heart Health',
     months: 14,
     markers: [
-      'Total cholesterol', 'LDL-C', 'HDL-C', 'Non-HDL-C', 'Triglycerides', 'ApoB',
-      'ApoA1', 'Lp(a)', 'LDL particle number', 'HDL particle number',
-      'Small dense LDL', 'Remnant cholesterol', 'VLDL cholesterol',
-      'Cholesterol / HDL ratio', 'Triglyceride / HDL ratio', 'Oxidised LDL',
-      'Lp-PLA2', 'Myeloperoxidase', 'TMAO', 'ADMA', 'Galectin-3', 'NT-proBNP',
-      'Troponin I', 'Homocysteine',
+      'Apolipoprotein B', 'CT coronary angiogram (CTCA)', 'Diastolic Blood Pressure Profiling',
+      'HDL Cholesterol', 'High Sensitivity C-Reactive Protein', 'LDL Cholesterol',
+      'Lipoprotein (a) / Lp (a)', 'Non-HDL Cholesterol', 'Serum Triglycerides',
+      'Systolic Blood Pressure Profiling', 'Total Cholesterol', 'CT Calcium Score',
+      'Homocysteine', 'ApoB:LDL-C Ratio', 'Remnant Cholesterol', 'AIP (Atherogenic Index)',
+      'MHR (Monocyte:HDL Ratio)', 'CAR (CRP:Albumin Ratio)',
     ],
   },
   hormone: {
     name: 'Hormone Health',
     months: 27,
     markers: [
-      'Testosterone (total)', 'Free testosterone', 'SHBG', 'DHEA-S', 'Oestradiol',
-      'Progesterone', 'LH', 'FSH', 'Prolactin', 'TSH', 'Free T4', 'Free T3',
-      'Reverse T3', 'Cortisol (AM)', 'IGF-1', 'Aldosterone',
+      'Estradiol', 'Progesterone', 'LH/FSH Ratio', 'Luteinizing Hormone (LH)',
+      'Follicle-Stimulating Hormone (FSH)', 'Prolactin', 'Free Testosterone',
+      'Total Testosterone', 'Free Androgen Index (FAI)', 'DHEAS', 'Cortisol',
+      'Sex Hormone-Binding Globulin level (SHBG)', 'Parathyroid Hormone (PTH)', 'ACTH',
+      'Serum Ferritin', 'Serum Transferrin', 'Total Iron-Binding Capacity (TIBC)',
     ],
   },
-  blood: {
-    name: 'Blood and Bone Marrow Function',
+  metabolic: {
+    name: 'Metabolic Function',
     months: 13,
     markers: [
-      'Haemoglobin', 'Haematocrit', 'Red cell count', 'MCV', 'MCH', 'MCHC', 'RDW',
-      'Platelets', 'MPV', 'White cell count', 'Neutrophils', 'Lymphocytes',
-      'Monocytes', 'Eosinophils', 'Basophils', 'Reticulocytes',
-      'Immature granulocytes',
+      'Estimated Average Glucose', 'Fasting Glucose', 'Fasting Insulin', 'HbA1c (IFCC)',
+      'HbA1c (NGSP)', 'Uric Acid', 'HOMA-IR', 'FIB-4', 'AST:ALT Ratio', 'GGT:HDL Ratio',
+    ],
+  },
+  liver: {
+    name: 'Liver Function',
+    months: 14,
+    markers: [
+      'Alanine Aminotransferase (ALT)', 'Alkaline Phosphatase (ALP)',
+      'Aspartate Transaminase (AST)', 'Gamma-GT', 'Serum Albumin', 'Serum Bilirubin',
+      'Serum Globulin', 'Total Serum Protein',
+    ],
+  },
+  cancer: {
+    name: 'Cancer Detection',
+    months: 21,
+    markers: [
+      'Cancer Antigen 125', 'Colonoscopy', 'Full Body MRI', 'Gastroscopy',
+      'Lung CT chest', 'Ultrasound', 'Comprehensive Skin Check', 'C-Reactive Protein',
+      'Prostate Specific Antigen (PSA)', 'Alanine Aminotransferase (ALT)',
+      'CT Chest Lung Cancer Screening',
     ],
   },
   nutrition: {
     name: 'Nutrition',
     months: 15,
     markers: [
-      'Vitamin D', 'Vitamin B12', 'Active B12', 'Folate', 'Zinc', 'Copper',
-      'Selenium', 'Magnesium (RBC)', 'Vitamin A', 'Vitamin E', 'Vitamin B1',
-      'Vitamin B6', 'Vitamin K1', 'Iodine', 'Omega-3 index', 'Omega-6 : 3 ratio',
-    ],
-  },
-  metabolic: {
-    name: 'Metabolic Function',
-    months: 13,
-    markers: ['Glucose (fasting)', 'HbA1c', 'Fasting insulin', 'HOMA-IR', 'C-peptide'],
-  },
-  liver: {
-    name: 'Liver Function',
-    months: 14,
-    markers: ['ALT', 'AST', 'ALP', 'GGT', 'Total bilirubin', 'Albumin', 'Total protein', 'Globulin'],
-  },
-  kidney: {
-    name: 'Kidney Function',
-    months: 14,
-    markers: ['Creatinine', 'eGFR', 'Urea', 'Cystatin C', 'Uric acid', 'Urine albumin / creatinine'],
-  },
-  electrolytes: {
-    name: 'Electrolytes',
-    months: 13,
-    markers: ['Sodium', 'Potassium', 'Chloride', 'Bicarbonate', 'Calcium', 'Phosphate', 'Magnesium (serum)'],
-  },
-  iron: {
-    name: 'Iron Studies',
-    months: 15,
-    markers: ['Iron', 'Ferritin', 'Transferrin saturation', 'TIBC'],
-  },
-  inflammation: {
-    name: 'Inflammation',
-    months: 16,
-    markers: ['hs-CRP', 'ESR', 'Fibrinogen', 'IL-6', 'TNF-alpha'],
-  },
-  autoimmunity: {
-    name: 'Autoimmunity',
-    months: 27,
-    markers: [
-      'ANA', 'Rheumatoid factor', 'Anti-CCP', 'TPO antibodies',
-      'Thyroglobulin antibodies', 'Complement C3', 'Complement C4',
-      'Immunoglobulin A', 'Immunoglobulin G',
-    ],
-  },
-  cancer: {
-    name: 'Cancer Detection',
-    months: 21,
-    markers: ['PSA (total)', 'PSA (free)', 'CA 125', 'CA 19-9', 'CEA', 'AFP', 'CA 15-3', 'Beta-2 microglobulin'],
-  },
-  metals: {
-    name: 'Heavy Metals',
-    months: 34,
-    markers: [
-      'Lead', 'Mercury', 'Arsenic', 'Cadmium', 'Aluminium', 'Nickel', 'Thallium',
-      'Antimony', 'Barium', 'Caesium', 'Uranium', 'Tin',
+      'Food Diary Analysis', 'Magnesium', 'Nutrition Optimisation Advice',
+      'Continuous Glucose Monitoring (CGM)', 'Folate', 'Serum Calcium',
+      'Corrected Calcium', 'Phosphate', 'Active B12',
     ],
   },
   gut: {
     name: 'Gut Health',
     months: 21,
     markers: [
-      'Faecal calprotectin', 'Pancreatic elastase', 'Secretory IgA',
-      'H. pylori antigen', 'Faecal occult blood', 'Zonulin',
+      'Microbial richness', 'Mucin consuming microbes', 'Oral species',
+      'Oxalate consuming microbes', 'Propionate producing microbes',
+      'TMA producing microbes', 'Faecal occult blood', 'Calprotectin', 'Lactoferrin',
+      'Pancreatic elastase', 'Secretory IgA', 'Zonulin', 'Faecal pH',
+      'Aeromonas spp.', 'Campylobacter spp.', 'Clostridium difficile toxin B',
+      'Cryptosporidium spp.', 'Cyclospora cayetanensis', 'Dientamoeba fragilis',
+      'E. coli O157', 'Entamoeba histolytica', 'EAEC', 'EPEC', 'ETEC',
+      'Giardia lamblia', 'Hypervirulent Clostridium difficile', 'Salmonella spp.',
+      'Shiga Toxin', 'Shigella spp. / EIEC', 'Vibrio spp.', 'Yersinia enterocolitica',
+      'Acetate producing microbes', 'B.fragilis toxin producing microbes',
+      'BCAA producing microbes', 'Beta-glucuronidase producing microbes',
+      'Butyrate producing microbes',
+      'Hexa-acylated lipopolysaccharide (hexa-LPS) producing microbes',
+      'Hydrogen sulphide producing microbes', '3-IPA producing microbes',
+      'Methane producing archaea', 'Microbial diversity',
+    ],
+  },
+  blood: {
+    name: 'Blood and Bone Marrow Function',
+    months: 13,
+    markers: [
+      'Haematocrit', 'Haemoglobin', 'Mean Corpuscular Haemoglobin (MCH)',
+      'Mean Corpuscular Haemoglobin Concentration (MCHC)',
+      'Mean Corpuscular Volume (MCV)', 'Platelets', 'Red Cell Count',
+      'Red Cell Distribution Width (RDW)',
+    ],
+  },
+  kidney: {
+    name: 'Kidney Function',
+    months: 14,
+    markers: [
+      'Creatinine', 'Estimated Glomerular Filtration Rate (eGFR)', 'Urea', 'BUN',
+      'BUN:Creatinine Ratio', 'SUA:Creatinine Ratio', 'Ca:Phosphate Ratio',
+    ],
+  },
+  autoimmunity: {
+    name: 'Autoimmunity',
+    months: 16,
+    markers: ['Basophils', 'Eosinophils', 'Lymphocytes', 'Monocytes', 'Neutrophils', 'Total White Cell Count'],
+  },
+  dexa: {
+    name: 'Full Body Composition/DEXA',
+    months: 18,
+    markers: [
+      'Android/Gynoid Ratio', 'Body Mass Index (BMI)', 'Estimated VAT Mass',
+      'Estimated VAT Volume', 'Fat Free Mass Index (FFMI)', 'Fat Mass Index (FMI)',
+      'Lean Mass of Arms', 'Lean Mass of Legs', 'Relative Skeletal Muscle Index (RSMI)',
+      'Total Body % Fat', 'Total Fat Mass', 'Total Lean Mass',
+      'Upper body lean mass asymmetry', 'Lower body lean mass asymmetry',
     ],
   },
   bone: {
     name: 'Bone Health',
     months: 24,
-    markers: ['Parathyroid hormone', 'Bone-specific ALP', 'Osteocalcin', 'C-telopeptide (CTX)'],
+    markers: [
+      'Femoral Neck Densities', 'Multi-level Lumbar Spine Densities',
+      'Standardised Bone Density Comparisons', 'Total Body Bone Mineral Content',
+      'Vitamin D',
+    ],
   },
+  muscle: {
+    name: 'Muscle Health',
+    months: 19,
+    markers: [
+      'Grip Strength', 'Isometric Squat', 'Balance Assessment',
+      'Exercise Optimisation Plan', 'Counter Movement Jump (CMJ)',
+    ],
+  },
+  genetic: {
+    name: 'Genetic Health',
+    months: 30,
+    markers: ['Preventive Health Genetic Test', 'Pharmacogenetics Blood Test', 'DNA Methylation'],
+  },
+  allergies: {
+    name: 'Allergies',
+    months: 22,
+    markers: ['Alternaria alternata', 'Cat Allergy', 'Dustmite', 'Rye Grass Pollen'],
+  },
+  metals: {
+    name: 'Heavy Metals',
+    months: 34,
+    markers: ['Lead', 'Mercury', 'Zinc'],
+  },
+  electrolytes: {
+    name: 'Electrolytes',
+    months: 13,
+    markers: ['Bicarbonate', 'Chloride', 'Potassium', 'Sodium'],
+  },
+  iron: {
+    name: 'Iron Studies',
+    months: 15,
+    markers: ['Serum Iron', 'Transferrin Saturation', 'Serum Ferritin'],
+  },
+  inflammation: {
+    name: 'Inflammation',
+    months: 16,
+    markers: ['ESR'],
+  },
+  bloodInflammation: {
+    name: 'Blood & Inflammation',
+    months: 13,
+    markers: [
+      'NLR (Neutrophil:Lymphocyte Ratio)', 'PLR (Platelet:Lymphocyte Ratio)',
+      'SIRI (Systemic Inflammation Index)',
+    ],
+  },
+  hormoneRatios: {
+    name: 'Hormone Ratios',
+    months: 27,
+    markers: [
+      'Cortisol:DHEA-S Ratio', 'T:Cortisol Ratio', 'FAI (Free Androgen Index)',
+      'T:E2 Ratio (M only)', 'LH:FSH Ratio', 'Pg:E2 Ratio (F only)',
+    ],
+  },
+  aerobic: { name: 'Aerobic Capacity', months: 19, markers: ['VO2 max'] },
+  bioAge: { name: 'Biological Age', months: 27, markers: ['Biological Age'] },
 }
 
 /**
@@ -177,12 +255,12 @@ function buildPanels(ids, outdatedTotal, neverTotal) {
   })
 }
 
-// Dates match the panel each marker belongs to, so the two sections tell the
+// Real markers, dated to the panel each belongs to so the two sections tell the
 // same story. All three are stale, since every panel here is past a year.
 const AT_RISK = [
-  { name: 'ApoB', value: 1.28, unit: 'g/L', lastTested: monthsBack(LIBRARY.heart.months), status: 'outdated', verdict: 'out-of-range', position: 0.84 },
-  { name: 'Free T3', value: 2.9, unit: 'pmol/L', lastTested: monthsBack(LIBRARY.hormone.months), status: 'outdated', verdict: 'out-of-range', position: 0.11 },
-  { name: 'Serum alkaline phosphatase (ALP)', value: 118, unit: 'U/L', lastTested: monthsBack(LIBRARY.liver.months), status: 'outdated', verdict: 'suboptimal', position: 0.62 },
+  { name: 'Apolipoprotein B', value: 1.28, unit: 'g/L', lastTested: monthsBack(LIBRARY.heart.months), status: 'outdated', verdict: 'out-of-range', position: 0.84 },
+  { name: 'Total Testosterone', value: 8.4, unit: 'nmol/L', lastTested: monthsBack(LIBRARY.hormone.months), status: 'outdated', verdict: 'out-of-range', position: 0.11 },
+  { name: 'Alkaline Phosphatase (ALP)', value: 118, unit: 'U/L', lastTested: monthsBack(LIBRARY.liver.months), status: 'outdated', verdict: 'suboptimal', position: 0.62 },
 ]
 
 const PERKS = [
@@ -216,7 +294,7 @@ const VO2 = {
   memberPrice: 299,
   image: photo('1461896836934-ffe607ba8211'),
   status: 'paid',
-  markers: 8,
+  markers: 6,
 }
 
 const DEXA = {
@@ -226,7 +304,7 @@ const DEXA = {
   price: 499,
   memberPrice: 399,
   image: photo('1579165466991-467135ad3110'),
-  markers: 16,
+  markers: 14,
 }
 
 const HORMONE = {
@@ -235,16 +313,16 @@ const HORMONE = {
   price: 249,
   memberPrice: 199,
   image: photo('1532187863486-abf9dbad1b69'),
-  markers: 18,
+  markers: 12,
 }
 
-const METALS = {
-  id: 'metals',
-  name: 'Heavy Metals Screen',
+const GUT = {
+  id: 'gut',
+  name: 'Gut Microbiome Test',
   price: 349,
   memberPrice: 279,
   image: photo('1581595220892-b0739db3ba8c'),
-  markers: 12,
+  markers: 20,
 }
 
 // Big profile only: recommended, but a first-time test rather than a retest, so
@@ -275,41 +353,42 @@ const profile = ({ panels, outdated, never, bioAgeKnown, membershipMarkers, prod
   products,
 })
 
-const SMALL = ['heart', 'hormone', 'blood', 'nutrition', 'metabolic', 'liver', 'kidney', 'electrolytes']
-const MEDIUM = [...SMALL, 'iron', 'inflammation']
-const BIG = [...MEDIUM, 'autoimmunity', 'cancer', 'metals', 'gut', 'bone']
+// Each size adds two panels to the one below it.
+const SMALL = ['heart', 'hormone', 'metabolic', 'liver']
+const MEDIUM = [...SMALL, 'cancer', 'nutrition']
+const BIG = [...MEDIUM, 'gut', 'blood']
 
 export const PROFILES = {
-  'Small — 60 markers to refresh': profile({
+  'Small — 4 panels': profile({
     panels: SMALL,
-    outdated: 60,
-    never: 4,
+    outdated: 36,
+    never: 3,
     bioAgeKnown: false,
-    membershipMarkers: 40,
+    membershipMarkers: 24,
     // Simplest case: nothing prepaid, nothing non-contributing.
     products: [DEXA, HORMONE],
   }),
 
-  'Medium — 88 markers to refresh': profile({
+  'Medium — 6 panels': profile({
     panels: MEDIUM,
-    outdated: 88,
-    never: 6,
+    outdated: 52,
+    never: 4,
     bioAgeKnown: false,
-    membershipMarkers: 55,
+    membershipMarkers: 34,
     // Adds a prepaid item.
     products: [VO2, DEXA, HORMONE],
   }),
 
-  'Big — 130 markers to refresh': profile({
+  'Big — 8 panels': profile({
     panels: BIG,
-    outdated: 130,
-    never: 8,
+    outdated: 90,
+    never: 6,
     bioAgeKnown: false,
-    membershipMarkers: 80,
+    membershipMarkers: 56,
     // Adds a recommended item that contributes nothing to the outdated pile.
-    products: [VO2, DEXA, HORMONE, METALS, CALCIUM],
+    products: [VO2, DEXA, HORMONE, GUT, CALCIUM],
   }),
 }
 
 /** Default fixture. */
-export const PAYLOAD = PROFILES['Small — 60 markers to refresh']
+export const PAYLOAD = PROFILES['Small — 4 panels']
