@@ -80,8 +80,10 @@ function PanelRow({ panel, open, onToggle }) {
       <button type="button" className="prow prowin" onClick={onToggle} aria-expanded={open} aria-controls={bodyId}>
         <div className="pmeta">
           <div className="pname typography-body-300-medium">{panel.name}</div>
+          {/* Same size as the "18 outdated" label opposite, so the two supporting
+              lines read as a pair across the row. */}
           {tested && (
-            <div className="ptested text-fg-neutral-secondary-100 typography-body-200-regular">
+            <div className="ptested text-fg-neutral-secondary-100 typography-body-100-regular">
               <DS.IconClock size={16} />
               <span>{tested}</span>
             </div>

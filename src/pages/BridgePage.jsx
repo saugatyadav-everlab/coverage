@@ -71,8 +71,16 @@ export default function BridgePage() {
 
           {panels.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div className="seclabel typography-body-400-medium">
-                {monthsStale} {monthsStale === 1 ? 'month' : 'months'} since your last test
+              <div>
+                <div className="seclabel typography-body-400-medium">
+                  {monthsStale} {monthsStale === 1 ? 'month' : 'months'} since your last test
+                </div>
+                <div
+                  className="text-fg-neutral-secondary-100 typography-body-200-regular"
+                  style={{ lineHeight: 1.6, marginTop: 6, maxWidth: 640 }}
+                >
+                  Whether they improved, held, or got worse since is unanswered until they are measured again.
+                </div>
               </div>
               <PanelAccordion panels={panels} />
             </div>
@@ -80,15 +88,10 @@ export default function BridgePage() {
 
           {atRisk.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div>
-                <div className="seclabel typography-body-400-medium">Biomarkers at risk</div>
-                <div
-                  className="text-fg-neutral-secondary-100 typography-body-200-regular"
-                  style={{ lineHeight: 1.6, marginTop: 7, maxWidth: 640 }}
-                >
-                  Whether they improved, held, or got worse since is unanswered until they are measured again.
-                </div>
-              </div>
+              {/* This section's subtitle moved up to the panels heading, where it
+                  covers every outdated marker rather than just the flagged ones.
+                  Repeating it here would say the same sentence twice on one screen. */}
+              <div className="seclabel typography-body-400-medium">Biomarkers at risk</div>
               <AtRiskTable markers={atRisk} />
             </div>
           )}
