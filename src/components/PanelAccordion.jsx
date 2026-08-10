@@ -94,7 +94,8 @@ function PanelRow({ panel, open, onToggle }) {
           <OutdatedBar outdated={panel.counts.outdated} total={panel.total} />
           <div className="pcount typography-body-100-regular">
             <span className="bg-bg-brand-orange-primary-100" style={{ flex: 'none', width: 6, height: 6, borderRadius: '50%' }} />
-            <span className="text-fg-brand-orange-primary-100">{panel.counts.outdated}</span>
+            {/* The dot carries the colour; the numbers read as one phrase. */}
+            <span className="text-fg-neutral-secondary-100">{panel.counts.outdated}</span>
             <span className="text-fg-neutral-secondary-100">/ {panel.total} outdated</span>
           </div>
         </div>
