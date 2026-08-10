@@ -8,16 +8,16 @@ import { PanelAccordion } from '../components/PanelAccordion'
 import { AtRiskTable } from '../components/AtRiskTable'
 import { useCoverage } from '../data/CoverageProvider'
 import { MESSAGE, emit } from '../data/host'
+import { monthsSince } from '../data/format'
 
 export default function BridgePage() {
   const navigate = useNavigate()
   const { payload } = useCoverage()
   const { profile, panels, atRisk } = payload
 
-  // Panels worth surfacing, worst first.
-  const needsAttention = panels
-    .filter((panel) => panel.counts.outdated > 0 || panel.counts.never > 0)
-    .sort((a, b) => b.counts.outdated - a.counts.outdated || b.counts.never - a.counts.never)
+  // Which panels appear, and in what order, is the host's call — it filters on
+  // its own recency threshold before sending. We render what we're given.
+  const monthsStale = monthsSince(profile.lastTested)
 
   const goToRefresh = () => {
     emit(MESSAGE.NAVIGATE, { page: 'refresh' })
@@ -69,10 +69,12 @@ export default function BridgePage() {
             <CoverageHero profile={profile} />
           </div>
 
-          {needsAttention.length > 0 && (
+          {panels.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div className="seclabel typography-body-400-medium">Panels that need attention</div>
-              <PanelAccordion panels={needsAttention} />
+              <div className="seclabel typography-body-400-medium">
+                {monthsStale} {monthsStale === 1 ? 'month' : 'months'} since your last test
+              </div>
+              <PanelAccordion panels={panels} />
             </div>
           )}
 

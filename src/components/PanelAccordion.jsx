@@ -2,12 +2,13 @@ import { useState } from 'react'
 
 import { DS } from '../ds/loadDs'
 import { MARKER_STATUS } from '../data/schema'
+import { monthsAgo } from '../data/format'
 
 const GROUPS = [
   {
     status: MARKER_STATUS.OUTDATED,
     heading: 'Outdated',
-    dot: <span className="bg-bg-sentiment-negative-primary-100" style={{ flex: 'none', width: 6, height: 6, borderRadius: '50%' }} />,
+    dot: <span className="bg-bg-brand-orange-primary-100" style={{ flex: 'none', width: 6, height: 6, borderRadius: '50%' }} />,
     textClass: '',
   },
   {
@@ -54,30 +55,51 @@ function MarkerGroup({ group, markers }) {
   )
 }
 
+/**
+ * How much of the panel has aged out, as a proportion of its markers. Reading
+ * the bar against the count lets several panels be ranked at a glance, which
+ * the marker total on its own never allowed.
+ */
+function OutdatedBar({ outdated, total }) {
+  const remainder = Math.max(0, total - outdated)
+
+  return (
+    <div className="pbar" aria-hidden="true">
+      {outdated > 0 && <span className="bg-bg-brand-orange-primary-100 pbar-fill" style={{ flexGrow: outdated }} />}
+      {remainder > 0 && <span className="bg-bg-neutral-primary-300 pbar-rest" style={{ flexGrow: remainder }} />}
+    </div>
+  )
+}
+
 function PanelRow({ panel, open, onToggle }) {
   const bodyId = `panel-body-${panel.id}`
+  const tested = monthsAgo(panel.lastTested)
 
   return (
     <div className="rounded-xl bg-bg-neutral-tertiary-100" style={{ overflow: 'hidden' }}>
       <button type="button" className="prow prowin" onClick={onToggle} aria-expanded={open} aria-controls={bodyId}>
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div className="pmeta">
           <div className="pname typography-body-300-medium">{panel.name}</div>
-          <div className="text-fg-neutral-tertiary-100 typography-body-100-regular" style={{ marginTop: 5 }}>
-            {panel.total} markers
+          {tested && (
+            <div className="ptested text-fg-neutral-secondary-100 typography-body-200-regular">
+              <DS.IconClock size={16} />
+              <span>{tested}</span>
+            </div>
+          )}
+        </div>
+
+        <div className="pprogress">
+          <OutdatedBar outdated={panel.counts.outdated} total={panel.total} />
+          <div className="pcount typography-body-100-regular">
+            <span className="bg-bg-brand-orange-primary-100" style={{ flex: 'none', width: 6, height: 6, borderRadius: '50%' }} />
+            <span className="text-fg-brand-orange-primary-100">{panel.counts.outdated}</span>
+            <span className="text-fg-neutral-secondary-100">/ {panel.total} outdated</span>
           </div>
         </div>
 
-        <div style={{ flex: 'none', textAlign: 'right' }}>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 8 }}>
-            <span className="bg-bg-sentiment-negative-primary-100" style={{ flex: 'none', width: 7, height: 7, borderRadius: '50%' }} />
-            <span className="typography-body-200-medium">{panel.counts.outdated}</span>
-            <span style={{ position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)' }}>outdated markers</span>
-          </div>
-        </div>
-
-        <span className="text-fg-neutral-tertiary-100" style={{ flex: 'none', display: 'flex', width: 18, justifyContent: 'center' }}>
+        <span className="text-fg-neutral-tertiary-100" style={{ flex: 'none', display: 'flex' }}>
           <span style={{ display: 'flex', transform: open ? 'rotate(180deg)' : 'none', transition: 'transform .14s ease' }}>
-            <DS.IconChevronDown size={18} />
+            <DS.IconChevronDown size={16} />
           </span>
         </span>
       </button>
@@ -86,7 +108,7 @@ function PanelRow({ panel, open, onToggle }) {
         <div
           id={bodyId}
           className="border-br-neutral-tertiary-100"
-          style={{ borderTopWidth: 1, borderTopStyle: 'solid', padding: '16px 18px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}
+          style={{ borderTopWidth: 1, borderTopStyle: 'solid', padding: '16px 20px 20px', display: 'flex', flexDirection: 'column', gap: 16 }}
         >
           {GROUPS.map((group) => (
             <MarkerGroup key={group.status} group={group} markers={panel.markers.filter((m) => m.status === group.status)} />

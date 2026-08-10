@@ -34,4 +34,29 @@ export function formatMeasurement(value, unit) {
 
 export const pct = (value, digits = 1) => `${Number(value || 0).toFixed(digits)}%`
 
+/** Whole months between `value` and now. Null when the date is unusable. */
+export function monthsSince(value, now = new Date()) {
+  if (!value) return null
+  const date = value instanceof Date ? value : new Date(value)
+  if (Number.isNaN(date.getTime())) return null
+
+  let months = (now.getFullYear() - date.getFullYear()) * 12 + (now.getMonth() - date.getMonth())
+  if (now.getDate() < date.getDate()) months -= 1
+  return Math.max(0, months)
+}
+
+/**
+ * "13 months ago" for the panel rows.
+ *
+ * Under a month there is no designed wording, so it falls back to the absolute
+ * month rather than inventing one — in practice these panels are months stale,
+ * since the host only sends panels past its own recency threshold.
+ */
+export function monthsAgo(value, now = new Date()) {
+  const months = monthsSince(value, now)
+  if (months == null) return null
+  if (months < 1) return formatMonthYear(value)
+  return `${months} ${months === 1 ? 'month' : 'months'} ago`
+}
+
 export const plural = (count, one, many = `${one}s`) => `${count} ${count === 1 ? one : many}`

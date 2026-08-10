@@ -152,10 +152,42 @@ html[data-embedded='1'] .shell {
   background: var(--ds-color-bg-neutral-tertiary-200);
 }
 .prowin {
-  padding: 16px 18px;
+  padding: 20px;
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
+}
+.pmeta {
+  flex: 1;
+  min-width: 0;
+}
+.ptested {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+}
+.pprogress {
+  flex: none;
+  width: 163px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pbar {
+  display: flex;
+  gap: 1px;
+  height: 4px;
+}
+.pbar-fill,
+.pbar-rest {
+  border-radius: 999px;
+}
+.pcount {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
 }
 .riskrow {
   display: grid;
