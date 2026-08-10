@@ -15,7 +15,17 @@
 
 import { decodePayload } from './codec'
 import { MESSAGE, emit, isEmbedded, listen } from './host'
-import { DEMO_PAYLOAD } from './demo'
+
+/**
+ * The demo payload is the test console's fixture, loaded at runtime rather than
+ * bundled. Keeping one copy means the standalone page and the console can never
+ * drift into showing different panels — and it keeps the fixture out of the
+ * production bundle, since only this fallback path ever asks for it.
+ */
+async function demoPayload() {
+  const module = await import(/* @vite-ignore */ `${import.meta.env.BASE_URL}embed-example-payload.js`)
+  return module.PAYLOAD
+}
 
 export const SOURCE = {
   URL_COMPRESSED: 'url:d',
@@ -70,10 +80,10 @@ export async function resolvePayload(searchParams, options = {}) {
     return { payload: await response.json(), source: SOURCE.FETCH }
   }
 
-  if (params.get('demo') === '1') return { payload: DEMO_PAYLOAD, source: SOURCE.DEMO }
+  if (params.get('demo') === '1') return { payload: await demoPayload(), source: SOURCE.DEMO }
 
   if (isEmbedded()) return { payload: await fromHost(timeoutMs), source: SOURCE.HOST }
 
   // Standalone with no parameters: show the demo rather than an empty page.
-  return { payload: DEMO_PAYLOAD, source: SOURCE.DEMO }
+  return { payload: await demoPayload(), source: SOURCE.DEMO }
 }

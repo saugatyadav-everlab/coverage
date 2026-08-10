@@ -298,10 +298,13 @@ html[data-embedded='1'] .shell {
     bottom: calc(100% + 10px);
     width: 100%;
   }
-  /* Stay beside the dial rather than wrapping under it. */
+  /* Stay beside the dial rather than wrapping under it. Basis must be 0, not
+     auto: wrapping is decided on an item's base size before any shrinking, so a
+     content-sized basis pushes the legend onto its own line even though it would
+     happily shrink to fit. */
   .legcol {
     min-width: 0;
-    flex: 1 1 auto;
+    flex: 1 1 0;
   }
   .legrow {
     grid-template-columns: minmax(0, 1fr) auto;
@@ -309,6 +312,9 @@ html[data-embedded='1'] .shell {
     padding: 13px 0;
   }
   .legrow > :nth-child(2) {
+    display: none;
+  }
+  .legunit {
     display: none;
   }
   .mkgrid {
@@ -338,6 +344,16 @@ html[data-embedded='1'] .shell {
   .prowin {
     padding: 14px;
     gap: 12px;
+  }
+  /* Give the panel name the room: the bar shrinks and the column collapses to
+     its content instead of holding a fixed 163px. */
+  .pprogress {
+    width: auto;
+    align-items: flex-end;
+    gap: 10px;
+  }
+  .pbar {
+    width: 80px;
   }
   .riskrow {
     grid-template-columns: minmax(0, 1fr) auto;

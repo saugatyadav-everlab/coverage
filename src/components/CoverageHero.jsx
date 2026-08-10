@@ -1,7 +1,7 @@
 import { DS } from '../ds/loadDs'
 import { CoverageDial } from './charts'
 import { InfoTooltip } from './InfoTooltip'
-import { formatMonthYear, pct, plural } from '../data/format'
+import { formatMonthYear, pct } from '../data/format'
 
 /**
  * The Bridge page's coverage hero.
@@ -21,18 +21,27 @@ import { formatMonthYear, pct, plural } from '../data/format'
 export function CoverageHero({ profile }) {
   const { tracked, outdated, valid, validPct, outdatedPct, lastTested, bioAge, bioAgeKnown, bioAgeNote } = profile
 
+  // The unit word is hidden on narrow screens (see .legunit) — the column is
+  // too tight for "17 biomarkers" beside a label, and the number carries it.
+  const count = (n) => (
+    <>
+      {n}
+      <span className="legunit"> {n === 1 ? 'biomarker' : 'biomarkers'}</span>
+    </>
+  )
+
   const legend = [
     {
       label: 'Valid',
       pct: pct(validPct),
-      count: plural(valid, 'biomarker'),
+      count: count(valid),
       glyph: <span style={{ flex: 'none', width: 14, height: 3, borderRadius: 2, background: '#fff' }} />,
       rule: 1,
     },
     {
       label: 'Outdated',
       pct: pct(outdatedPct),
-      count: plural(outdated, 'biomarker'),
+      count: count(outdated),
       glyph: (
         <span
           style={{ flex: 'none', width: 14, height: 0, borderTopWidth: 2, borderTopStyle: 'dashed', borderTopColor: 'rgba(255,255,255,.48)' }}
