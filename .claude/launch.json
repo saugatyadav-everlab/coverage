@@ -6,6 +6,12 @@
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
       "port": 5173
+    },
+    {
+      "name": "worktree-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev", "--", "--root", ".claude/worktrees/mobile-summary-bar", "--port", "5174", "--strictPort"],
+      "port": 5174
     }
   ]
 }

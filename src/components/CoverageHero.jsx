@@ -1,9 +1,25 @@
+import { DS } from '../ds/loadDs'
 import { CoverageDial } from './charts'
-import { pct, plural } from '../data/format'
+import { InfoTooltip } from './InfoTooltip'
+import { formatMonthYear, pct, plural } from '../data/format'
 
-/** The Bridge page's coverage hero. */
+/**
+ * The Bridge page's coverage hero.
+ *
+ * This absorbs what used to be a separate row of stat cards above it. Those
+ * cards mostly restated the entry-point card in the host app — total tracked is
+ * already in the headline, and biological age was already shown blurred there.
+ * Folding the two facts that aren't on the entry point into the hero makes it a
+ * superset of the card the member tapped rather than a repeat of it:
+ *
+ *   - Last tested sits beside the headline, so the date and the number it
+ *     explains are read together.
+ *   - Biological age sits beside the legend, so the blur reads as a consequence
+ *     of the outdated count rather than an unrelated metric that happens to be
+ *     unavailable.
+ */
 export function CoverageHero({ profile }) {
-  const { tracked, outdated, valid, validPct, outdatedPct } = profile
+  const { tracked, outdated, valid, validPct, outdatedPct, lastTested, bioAge, bioAgeKnown, bioAgeNote } = profile
 
   const legend = [
     {
@@ -38,10 +54,19 @@ export function CoverageHero({ profile }) {
         backgroundPosition: 'center',
       }}
     >
-      <div className="herotitle typography-body-500-medium" style={{ lineHeight: 1.35 }}>
-        Out of {tracked} biomarkers,
-        <br />
-        {outdated} of them are out of date now.
+      <div className="herohead">
+        <div className="herotitle typography-body-500-medium" style={{ lineHeight: 1.35 }}>
+          Out of {tracked} biomarkers,
+          <br />
+          {outdated} of them are out of date now.
+        </div>
+
+        {lastTested && (
+          <div className="herotested typography-body-200-regular">
+            <DS.IconClock size={20} />
+            <span>Last tested {formatMonthYear(lastTested)}</span>
+          </div>
+        )}
       </div>
 
       <div className="herorow">
@@ -63,6 +88,22 @@ export function CoverageHero({ profile }) {
             </div>
           ))}
         </div>
+
+        {bioAge != null && (
+          <div className="herobio">
+            <div
+              className="herobio-value typography-display-300"
+              style={bioAgeKnown ? undefined : { filter: 'blur(6px)', userSelect: 'none' }}
+              aria-hidden={bioAgeKnown ? undefined : true}
+            >
+              {bioAge}
+            </div>
+            <div className="herobio-label typography-body-200-medium">
+              <span>Biological age</span>
+              {!bioAgeKnown && <InfoTooltip text={bioAgeNote} align="right" />}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

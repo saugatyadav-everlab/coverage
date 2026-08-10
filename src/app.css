@@ -80,21 +80,44 @@ html[data-embedded='1'] .shell {
 
 /* ---------- Bridge ---------- */
 
-.statgrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+.herohead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+.herotested {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
 }
 
 .herorow {
   display: flex;
   align-items: center;
-  gap: 34px;
+  gap: 24px;
   margin-top: 24px;
   flex-wrap: wrap;
 }
+
+/* Sits beside the legend so the blur reads as a consequence of the gap, and
+   takes whatever width is left over rather than a fixed column. */
+.herobio {
+  flex: 1 1 150px;
+  min-width: 140px;
+  text-align: center;
+}
+.herobio-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  margin-top: 14px;
+}
 .legcol {
-  flex: 1;
+  flex: 2 1 320px;
   min-width: 300px;
   display: flex;
   flex-direction: column;
@@ -149,10 +172,31 @@ html[data-embedded='1'] .shell {
   display: none;
 }
 
+.tipwrap {
+  position: relative;
+  display: flex;
+  cursor: help;
+}
 .tipbub {
+  position: absolute;
+  top: 22px;
+  z-index: 20;
+  /* Never wider than the space available, so it can't push past the card. */
+  width: min(290px, calc(100cqw - 64px));
+  padding: 11px 13px;
+  line-height: 1.5;
+  border-width: 1px;
+  border-style: solid;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.22);
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.12s ease;
+}
+.tipbub--left {
+  left: -8px;
+}
+.tipbub--right {
+  right: -8px;
 }
 .tipwrap:hover .tipbub,
 .tipwrap:focus-within .tipbub {
@@ -177,16 +221,55 @@ html[data-embedded='1'] .shell {
   .foot {
     padding: 14px 18px 16px;
   }
-  .statgrid {
-    grid-template-columns: 1fr;
-    gap: 8px;
-  }
   .herorow {
     gap: 20px;
   }
+  /* Stack the date under the headline rather than squeezing both onto one row. */
+  .herohead {
+    flex-direction: column;
+    gap: 10px;
+  }
+  /* Bio age becomes a third legend row: label and info on the left, the value
+     on the right, matching how Valid and Outdated read. */
+  .herobio {
+    flex: 1 0 100%;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding-top: 13px;
+    border-top: 1px solid rgba(255, 255, 255, 0.16);
+  }
+  .herobio-value {
+    font-size: 22px;
+    line-height: 1.2;
+  }
+  .herobio-label {
+    margin-top: 0;
+    justify-content: flex-start;
+  }
+  /* The icon sits mid-row here, so neither edge of it has room for the bubble.
+     Anchor to the row instead: full width, directly above it. */
+  .herobio {
+    position: relative;
+  }
+  .herobio .tipwrap {
+    position: static;
+  }
+  .herobio .tipbub {
+    left: 0;
+    right: auto;
+    top: auto;
+    bottom: calc(100% + 10px);
+    width: 100%;
+  }
+  /* Stay beside the dial rather than wrapping under it. */
   .legcol {
     min-width: 0;
-    width: 100%;
+    flex: 1 1 auto;
   }
   .legrow {
     grid-template-columns: minmax(0, 1fr) auto;
@@ -199,9 +282,6 @@ html[data-embedded='1'] .shell {
   .mkgrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 2px 14px;
-  }
-  .statval {
-    font-size: 18px;
   }
   .pname {
     font-size: 14px;

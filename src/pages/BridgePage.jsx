@@ -2,14 +2,12 @@ import { useNavigate } from 'react-router-dom'
 
 import { DS } from '../ds/loadDs'
 import { PageShell } from '../components/PageShell'
-import { StatCard } from '../components/StatCard'
 import { CoverageHero } from '../components/CoverageHero'
 import { ProgressRing } from '../components/charts'
 import { PanelAccordion } from '../components/PanelAccordion'
 import { AtRiskTable } from '../components/AtRiskTable'
 import { useCoverage } from '../data/CoverageProvider'
 import { MESSAGE, emit } from '../data/host'
-import { formatMonthYear } from '../data/format'
 
 export default function BridgePage() {
   const navigate = useNavigate()
@@ -68,18 +66,6 @@ export default function BridgePage() {
         <div style={{ maxWidth: 800, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 40, paddingTop: 30 }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
             <div className="pagetitle typography-display-300">Your health profile</div>
-
-            <div className="statgrid">
-              <StatCard label="Biomarkers tracked" value={profile.tracked} />
-              <StatCard label="Last tested" value={formatMonthYear(profile.lastTested)} />
-              <StatCard
-                label="Biological age"
-                value={profile.bioAge ?? '—'}
-                blurred={!profile.bioAgeKnown}
-                tip={profile.bioAgeKnown ? null : profile.bioAgeNote}
-              />
-            </div>
-
             <CoverageHero profile={profile} />
           </div>
 
