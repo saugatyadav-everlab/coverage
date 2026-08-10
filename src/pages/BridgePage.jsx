@@ -8,7 +8,6 @@ import { PanelAccordion } from '../components/PanelAccordion'
 import { AtRiskTable } from '../components/AtRiskTable'
 import { useCoverage } from '../data/CoverageProvider'
 import { MESSAGE, emit } from '../data/host'
-import { monthsSince } from '../data/format'
 
 export default function BridgePage() {
   const navigate = useNavigate()
@@ -17,7 +16,6 @@ export default function BridgePage() {
 
   // Which panels appear, and in what order, is the host's call — it filters on
   // its own recency threshold before sending. We render what we're given.
-  const monthsStale = monthsSince(profile.lastTested)
 
   const goToRefresh = () => {
     emit(MESSAGE.NAVIGATE, { page: 'refresh' })
@@ -71,10 +69,11 @@ export default function BridgePage() {
 
           {panels.length > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {/* The heading names the section so the page stays scannable by
+                  headings alone. Elapsed time is left to the rows, which carry it
+                  per panel — more useful than an aggregate, and stated once. */}
               <div>
-                <div className="seclabel typography-body-400-medium">
-                  {monthsStale} {monthsStale === 1 ? 'month' : 'months'} since your last test
-                </div>
+                <div className="seclabel typography-body-400-medium">Panels that need attention</div>
                 <div
                   className="text-fg-neutral-secondary-100 typography-body-200-regular"
                   style={{ lineHeight: 1.6, marginTop: 6, maxWidth: 640 }}

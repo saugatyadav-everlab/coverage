@@ -2,8 +2,8 @@
  * Fixtures for the test console — three profile sizes.
  *
  * See src/data/schema.js for the full field reference. Nothing here is special:
- * these are ordinary payloads, built by hand from the marker library below so
- * the three sizes stay realistic rather than synthetic.
+ * these are ordinary payloads, built by hand from the panel library below so the
+ * three sizes stay realistic rather than synthetic.
  */
 
 /**
@@ -20,100 +20,116 @@ function monthsBack(n) {
   return d.toISOString().slice(0, 10)
 }
 
-// Marker names. The first six panels are the ones from the comps; the last four
-// are standard clinical panels added so the larger profiles have real names to
-// draw on — swap them for Everlab's actual panel content.
+/**
+ * Panel names are Everlab's official ones. Which markers sit under each is my
+ * grouping, not a clinical mapping — correct it against the real panel
+ * definitions before this gets shown as anything but layout.
+ */
 const LIBRARY = {
-  hormone: {
-    name: 'Hormone panel',
-    lastTested: monthsBack(27),
-    markers: [
-      'Testosterone (total)', 'Free testosterone', 'SHBG', 'DHEA-S', 'Oestradiol',
-      'Progesterone', 'LH', 'FSH', 'Prolactin', 'TSH', 'Free T4', 'Free T3',
-      'Reverse T3', 'TPO antibodies', 'Thyroglobulin antibodies', 'Cortisol (AM)',
-      'IGF-1', 'Aldosterone',
-    ],
-  },
-  cardiovascular: {
-    name: 'Cardiovascular panel',
-    lastTested: monthsBack(14),
+  heart: {
+    name: 'Heart Health',
+    months: 14,
     markers: [
       'Total cholesterol', 'LDL-C', 'HDL-C', 'Non-HDL-C', 'Triglycerides', 'ApoB',
       'ApoA1', 'Lp(a)', 'LDL particle number', 'HDL particle number',
       'Small dense LDL', 'Remnant cholesterol', 'VLDL cholesterol',
       'Cholesterol / HDL ratio', 'Triglyceride / HDL ratio', 'Oxidised LDL',
-      'hs-CRP', 'Homocysteine', 'Fibrinogen', 'Lp-PLA2', 'Myeloperoxidase',
-      'TMAO', 'ADMA', 'Galectin-3', 'NT-proBNP', 'Troponin I',
+      'Lp-PLA2', 'Myeloperoxidase', 'TMAO', 'ADMA', 'Galectin-3', 'NT-proBNP',
+      'Troponin I', 'Homocysteine',
     ],
   },
-  micronutrient: {
-    name: 'Micronutrient panel',
-    lastTested: monthsBack(15),
+  hormone: {
+    name: 'Hormone Health',
+    months: 27,
     markers: [
-      'Vitamin D', 'Vitamin B12', 'Active B12', 'Folate', 'Iron', 'Ferritin',
-      'Transferrin saturation', 'TIBC', 'Zinc', 'Copper', 'Selenium',
-      'Magnesium (RBC)', 'Vitamin A', 'Vitamin E', 'Vitamin B1', 'Vitamin B6',
-      'Iodine', 'Omega-3 index', 'Omega-6 : 3 ratio', 'Vitamin K1',
+      'Testosterone (total)', 'Free testosterone', 'SHBG', 'DHEA-S', 'Oestradiol',
+      'Progesterone', 'LH', 'FSH', 'Prolactin', 'TSH', 'Free T4', 'Free T3',
+      'Reverse T3', 'Cortisol (AM)', 'IGF-1', 'Aldosterone',
     ],
   },
-  metabolic: {
-    name: 'Metabolic panel',
-    lastTested: monthsBack(13),
-    markers: [
-      'Glucose (fasting)', 'HbA1c', 'Fasting insulin', 'HOMA-IR', 'C-peptide',
-      'Sodium', 'Potassium', 'Chloride', 'Bicarbonate', 'Calcium', 'Phosphate',
-      'Magnesium (serum)',
-    ],
-  },
-  fbc: {
-    name: 'Full blood count',
-    lastTested: monthsBack(13),
+  blood: {
+    name: 'Blood and Bone Marrow Function',
+    months: 13,
     markers: [
       'Haemoglobin', 'Haematocrit', 'Red cell count', 'MCV', 'MCH', 'MCHC', 'RDW',
       'Platelets', 'MPV', 'White cell count', 'Neutrophils', 'Lymphocytes',
-      'Monocytes', 'Eosinophils', 'Basophils', 'ESR', 'Reticulocytes',
+      'Monocytes', 'Eosinophils', 'Basophils', 'Reticulocytes',
       'Immature granulocytes',
     ],
   },
-  renalhepatic: {
-    name: 'Kidney & liver panel',
-    lastTested: monthsBack(14),
+  nutrition: {
+    name: 'Nutrition',
+    months: 15,
     markers: [
-      'ALT', 'AST', 'ALP', 'GGT', 'Total bilirubin', 'Albumin', 'Total protein',
-      'Globulin', 'Creatinine', 'eGFR', 'Urea', 'Cystatin C', 'Uric acid',
-      'Urine albumin / creatinine',
+      'Vitamin D', 'Vitamin B12', 'Active B12', 'Folate', 'Zinc', 'Copper',
+      'Selenium', 'Magnesium (RBC)', 'Vitamin A', 'Vitamin E', 'Vitamin B1',
+      'Vitamin B6', 'Vitamin K1', 'Iodine', 'Omega-3 index', 'Omega-6 : 3 ratio',
     ],
   },
-  immune: {
-    name: 'Immune & inflammation panel',
-    lastTested: monthsBack(27),
+  metabolic: {
+    name: 'Metabolic Function',
+    months: 13,
+    markers: ['Glucose (fasting)', 'HbA1c', 'Fasting insulin', 'HOMA-IR', 'C-peptide'],
+  },
+  liver: {
+    name: 'Liver Function',
+    months: 14,
+    markers: ['ALT', 'AST', 'ALP', 'GGT', 'Total bilirubin', 'Albumin', 'Total protein', 'Globulin'],
+  },
+  kidney: {
+    name: 'Kidney Function',
+    months: 14,
+    markers: ['Creatinine', 'eGFR', 'Urea', 'Cystatin C', 'Uric acid', 'Urine albumin / creatinine'],
+  },
+  electrolytes: {
+    name: 'Electrolytes',
+    months: 13,
+    markers: ['Sodium', 'Potassium', 'Chloride', 'Bicarbonate', 'Calcium', 'Phosphate', 'Magnesium (serum)'],
+  },
+  iron: {
+    name: 'Iron Studies',
+    months: 15,
+    markers: ['Iron', 'Ferritin', 'Transferrin saturation', 'TIBC'],
+  },
+  inflammation: {
+    name: 'Inflammation',
+    months: 16,
+    markers: ['hs-CRP', 'ESR', 'Fibrinogen', 'IL-6', 'TNF-alpha'],
+  },
+  autoimmunity: {
+    name: 'Autoimmunity',
+    months: 27,
     markers: [
-      'IL-6', 'TNF-alpha', 'ANA', 'Rheumatoid factor', 'Anti-CCP',
-      'Complement C3', 'Complement C4', 'Immunoglobulin A', 'Immunoglobulin G',
-      'Immunoglobulin M',
+      'ANA', 'Rheumatoid factor', 'Anti-CCP', 'TPO antibodies',
+      'Thyroglobulin antibodies', 'Complement C3', 'Complement C4',
+      'Immunoglobulin A', 'Immunoglobulin G',
     ],
   },
-  urinalysis: {
-    name: 'Urinalysis',
-    lastTested: monthsBack(21),
-    markers: [
-      'Urine protein', 'Urine glucose', 'Urine ketones', 'Urine blood',
-      'Urine leukocytes', 'Urine nitrites', 'Urine pH', 'Urine specific gravity',
-      'Urine microalbumin', 'Urine creatinine',
-    ],
-  },
-  tumour: {
-    name: 'Tumour marker panel',
-    lastTested: monthsBack(21),
+  cancer: {
+    name: 'Cancer Detection',
+    months: 21,
     markers: ['PSA (total)', 'PSA (free)', 'CA 125', 'CA 19-9', 'CEA', 'AFP', 'CA 15-3', 'Beta-2 microglobulin'],
   },
   metals: {
-    name: 'Heavy metals panel',
-    lastTested: monthsBack(34),
+    name: 'Heavy Metals',
+    months: 34,
     markers: [
       'Lead', 'Mercury', 'Arsenic', 'Cadmium', 'Aluminium', 'Nickel', 'Thallium',
       'Antimony', 'Barium', 'Caesium', 'Uranium', 'Tin',
     ],
+  },
+  gut: {
+    name: 'Gut Health',
+    months: 21,
+    markers: [
+      'Faecal calprotectin', 'Pancreatic elastase', 'Secretory IgA',
+      'H. pylori antigen', 'Faecal occult blood', 'Zonulin',
+    ],
+  },
+  bone: {
+    name: 'Bone Health',
+    months: 24,
+    markers: ['Parathyroid hormone', 'Bone-specific ALP', 'Osteocalcin', 'C-telopeptide (CTX)'],
   },
 }
 
@@ -155,7 +171,7 @@ function buildPanels(ids, outdatedTotal, neverTotal) {
     return {
       id,
       name: LIBRARY[id].name,
-      lastTested: LIBRARY[id].lastTested,
+      lastTested: monthsBack(LIBRARY[id].months),
       markers: { outdated: all.slice(0, cut), never: all.slice(cut, end), current: all.slice(end) },
     }
   })
@@ -164,9 +180,9 @@ function buildPanels(ids, outdatedTotal, neverTotal) {
 // Dates match the panel each marker belongs to, so the two sections tell the
 // same story. All three are stale, since every panel here is past a year.
 const AT_RISK = [
-  { name: 'ApoB', value: 1.28, unit: 'g/L', lastTested: monthsBack(14), status: 'outdated', verdict: 'out-of-range', position: 0.84 },
-  { name: 'Free T3', value: 2.9, unit: 'pmol/L', lastTested: monthsBack(27), status: 'outdated', verdict: 'out-of-range', position: 0.11 },
-  { name: 'Serum alkaline phosphatase (ALP)', value: 118, unit: 'U/L', lastTested: monthsBack(14), status: 'outdated', verdict: 'suboptimal', position: 0.62 },
+  { name: 'ApoB', value: 1.28, unit: 'g/L', lastTested: monthsBack(LIBRARY.heart.months), status: 'outdated', verdict: 'out-of-range', position: 0.84 },
+  { name: 'Free T3', value: 2.9, unit: 'pmol/L', lastTested: monthsBack(LIBRARY.hormone.months), status: 'outdated', verdict: 'out-of-range', position: 0.11 },
+  { name: 'Serum alkaline phosphatase (ALP)', value: 118, unit: 'U/L', lastTested: monthsBack(LIBRARY.liver.months), status: 'outdated', verdict: 'suboptimal', position: 0.62 },
 ]
 
 const PERKS = [
@@ -183,6 +199,8 @@ const membership = (markers) => ({
   price: 299,
   priceNote: 'per year',
   image: '/assets/member-card.png',
+  // How many outdated markers this brings back. The page turns it into a
+  // percentage and a ring — don't send a percentage.
   markers,
   perks: PERKS,
 })
@@ -243,20 +261,27 @@ const CALCIUM = {
   markers: 4,
 }
 
+/** The member's own last test is the most recent panel they have. */
+const newestOf = (ids) => Math.min(...ids.map((id) => LIBRARY[id].months))
+
 const profile = ({ panels, outdated, never, bioAgeKnown, membershipMarkers, products }) => ({
   v: 1,
   currency: 'AUD',
   locale: 'en-AU',
-  profile: { tracked: undefined, lastTested: monthsBack(13), bioAge: 42, bioAgeKnown },
+  profile: { lastTested: monthsBack(newestOf(panels)), bioAge: 42, bioAgeKnown },
   panels: buildPanels(panels, outdated, never),
   atRisk: AT_RISK,
   membership: membership(membershipMarkers),
   products,
 })
 
+const SMALL = ['heart', 'hormone', 'blood', 'nutrition', 'metabolic', 'liver', 'kidney', 'electrolytes']
+const MEDIUM = [...SMALL, 'iron', 'inflammation']
+const BIG = [...MEDIUM, 'autoimmunity', 'cancer', 'metals', 'gut', 'bone']
+
 export const PROFILES = {
   'Small — 60 markers to refresh': profile({
-    panels: ['hormone', 'cardiovascular', 'micronutrient', 'metabolic', 'fbc', 'renalhepatic'],
+    panels: SMALL,
     outdated: 60,
     never: 4,
     bioAgeKnown: false,
@@ -266,10 +291,7 @@ export const PROFILES = {
   }),
 
   'Medium — 88 markers to refresh': profile({
-    panels: [
-      'hormone', 'cardiovascular', 'micronutrient', 'metabolic', 'fbc',
-      'renalhepatic', 'immune', 'urinalysis',
-    ],
+    panels: MEDIUM,
     outdated: 88,
     never: 6,
     bioAgeKnown: false,
@@ -279,10 +301,7 @@ export const PROFILES = {
   }),
 
   'Big — 130 markers to refresh': profile({
-    panels: [
-      'hormone', 'cardiovascular', 'micronutrient', 'metabolic', 'fbc',
-      'renalhepatic', 'immune', 'urinalysis', 'tumour', 'metals',
-    ],
+    panels: BIG,
     outdated: 130,
     never: 8,
     bioAgeKnown: false,
