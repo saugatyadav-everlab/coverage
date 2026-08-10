@@ -6,13 +6,27 @@
  * the three sizes stay realistic rather than synthetic.
  */
 
+/**
+ * An ISO date `n` months before today.
+ *
+ * The rows show relative time ("14 months ago"), so fixed dates would drift —
+ * a fixture written today reads as "5 months ago" and, six months from now, as
+ * "11 months ago". Deriving them keeps every preset lapsed no matter when it is
+ * opened. The payload still carries plain ISO dates, exactly as a host sends.
+ */
+function monthsBack(n) {
+  const d = new Date()
+  d.setMonth(d.getMonth() - n)
+  return d.toISOString().slice(0, 10)
+}
+
 // Marker names. The first six panels are the ones from the comps; the last four
 // are standard clinical panels added so the larger profiles have real names to
 // draw on — swap them for Everlab's actual panel content.
 const LIBRARY = {
   hormone: {
     name: 'Hormone panel',
-    lastTested: '2024-04-15',
+    lastTested: monthsBack(27),
     markers: [
       'Testosterone (total)', 'Free testosterone', 'SHBG', 'DHEA-S', 'Oestradiol',
       'Progesterone', 'LH', 'FSH', 'Prolactin', 'TSH', 'Free T4', 'Free T3',
@@ -22,7 +36,7 @@ const LIBRARY = {
   },
   cardiovascular: {
     name: 'Cardiovascular panel',
-    lastTested: '2025-06-10',
+    lastTested: monthsBack(14),
     markers: [
       'Total cholesterol', 'LDL-C', 'HDL-C', 'Non-HDL-C', 'Triglycerides', 'ApoB',
       'ApoA1', 'Lp(a)', 'LDL particle number', 'HDL particle number',
@@ -34,7 +48,7 @@ const LIBRARY = {
   },
   micronutrient: {
     name: 'Micronutrient panel',
-    lastTested: '2025-06-10',
+    lastTested: monthsBack(15),
     markers: [
       'Vitamin D', 'Vitamin B12', 'Active B12', 'Folate', 'Iron', 'Ferritin',
       'Transferrin saturation', 'TIBC', 'Zinc', 'Copper', 'Selenium',
@@ -44,7 +58,7 @@ const LIBRARY = {
   },
   metabolic: {
     name: 'Metabolic panel',
-    lastTested: '2026-02-14',
+    lastTested: monthsBack(13),
     markers: [
       'Glucose (fasting)', 'HbA1c', 'Fasting insulin', 'HOMA-IR', 'C-peptide',
       'Sodium', 'Potassium', 'Chloride', 'Bicarbonate', 'Calcium', 'Phosphate',
@@ -53,7 +67,7 @@ const LIBRARY = {
   },
   fbc: {
     name: 'Full blood count',
-    lastTested: '2026-02-14',
+    lastTested: monthsBack(13),
     markers: [
       'Haemoglobin', 'Haematocrit', 'Red cell count', 'MCV', 'MCH', 'MCHC', 'RDW',
       'Platelets', 'MPV', 'White cell count', 'Neutrophils', 'Lymphocytes',
@@ -63,7 +77,7 @@ const LIBRARY = {
   },
   renalhepatic: {
     name: 'Kidney & liver panel',
-    lastTested: '2026-02-14',
+    lastTested: monthsBack(14),
     markers: [
       'ALT', 'AST', 'ALP', 'GGT', 'Total bilirubin', 'Albumin', 'Total protein',
       'Globulin', 'Creatinine', 'eGFR', 'Urea', 'Cystatin C', 'Uric acid',
@@ -72,7 +86,7 @@ const LIBRARY = {
   },
   immune: {
     name: 'Immune & inflammation panel',
-    lastTested: '2024-04-15',
+    lastTested: monthsBack(27),
     markers: [
       'IL-6', 'TNF-alpha', 'ANA', 'Rheumatoid factor', 'Anti-CCP',
       'Complement C3', 'Complement C4', 'Immunoglobulin A', 'Immunoglobulin G',
@@ -81,7 +95,7 @@ const LIBRARY = {
   },
   urinalysis: {
     name: 'Urinalysis',
-    lastTested: '2024-11-02',
+    lastTested: monthsBack(21),
     markers: [
       'Urine protein', 'Urine glucose', 'Urine ketones', 'Urine blood',
       'Urine leukocytes', 'Urine nitrites', 'Urine pH', 'Urine specific gravity',
@@ -90,12 +104,12 @@ const LIBRARY = {
   },
   tumour: {
     name: 'Tumour marker panel',
-    lastTested: '2024-11-02',
+    lastTested: monthsBack(21),
     markers: ['PSA (total)', 'PSA (free)', 'CA 125', 'CA 19-9', 'CEA', 'AFP', 'CA 15-3', 'Beta-2 microglobulin'],
   },
   metals: {
     name: 'Heavy metals panel',
-    lastTested: '2023-09-20',
+    lastTested: monthsBack(34),
     markers: [
       'Lead', 'Mercury', 'Arsenic', 'Cadmium', 'Aluminium', 'Nickel', 'Thallium',
       'Antimony', 'Barium', 'Caesium', 'Uranium', 'Tin',
@@ -147,10 +161,12 @@ function buildPanels(ids, outdatedTotal, neverTotal) {
   })
 }
 
+// Dates match the panel each marker belongs to, so the two sections tell the
+// same story. All three are stale, since every panel here is past a year.
 const AT_RISK = [
-  { name: 'ApoB', value: 1.28, unit: 'g/L', lastTested: '2025-06-10', status: 'outdated', verdict: 'out-of-range', position: 0.84 },
-  { name: 'Free T3', value: 2.9, unit: 'pmol/L', lastTested: '2024-04-15', status: 'outdated', verdict: 'out-of-range', position: 0.11 },
-  { name: 'Serum alkaline phosphatase (ALP)', value: 118, unit: 'U/L', lastTested: '2025-06-10', status: 'current', verdict: 'suboptimal', position: 0.62 },
+  { name: 'ApoB', value: 1.28, unit: 'g/L', lastTested: monthsBack(14), status: 'outdated', verdict: 'out-of-range', position: 0.84 },
+  { name: 'Free T3', value: 2.9, unit: 'pmol/L', lastTested: monthsBack(27), status: 'outdated', verdict: 'out-of-range', position: 0.11 },
+  { name: 'Serum alkaline phosphatase (ALP)', value: 118, unit: 'U/L', lastTested: monthsBack(14), status: 'outdated', verdict: 'suboptimal', position: 0.62 },
 ]
 
 const PERKS = [
@@ -231,7 +247,7 @@ const profile = ({ panels, outdated, never, bioAgeKnown, membershipMarkers, prod
   v: 1,
   currency: 'AUD',
   locale: 'en-AU',
-  profile: { tracked: undefined, lastTested: '2026-02-14', bioAge: 42, bioAgeKnown },
+  profile: { tracked: undefined, lastTested: monthsBack(13), bioAge: 42, bioAgeKnown },
   panels: buildPanels(panels, outdated, never),
   atRisk: AT_RISK,
   membership: membership(membershipMarkers),
