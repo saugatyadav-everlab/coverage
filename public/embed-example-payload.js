@@ -270,20 +270,30 @@ const PERKS = [
   'Member pricing on everything below',
 ]
 
+/** Everlab's service artwork. */
+const IMAGE = (id) =>
+  `https://app.everlab.com.au/cdn-cgi/image/format=auto/https://everlab-public-images.s3.ap-southeast-2.amazonaws.com/airtable/${id}`
+
+/** The blood test panel is a fixed size — it does not scale with the profile. */
+const BLOOD_TEST_MARKERS = 40
+
 const membership = (markers) => ({
   id: 'baseline',
   name: 'Baseline Membership',
   description: 'Bring most of your markers up to date.',
   price: 299,
   priceNote: 'per year',
-  image: '/assets/member-card.png',
+  // Advanced Blood Testing — the card leads with the test, so this is its image.
+  image: IMAGE('attOPA6uYbQnB7c1u'),
   // How many outdated markers this brings back. The page turns it into a
   // percentage and a ring — don't send a percentage.
   markers,
   perks: PERKS,
 })
 
-const photo = (id) => `https://images.unsplash.com/photo-${id}?w=240&h=240&fit=crop`
+// Real services, with contributions sized to the panels each preset carries.
+// A blood test can't refresh a DEXA scan or a stool sample, so the add-ons are
+// what close the non-blood part of the gap.
 
 // Already booked: locked, never charged, and in the progress ring from load.
 const VO2 = {
@@ -292,9 +302,9 @@ const VO2 = {
   why: 'Recommended retesting every year',
   price: 399,
   memberPrice: 299,
-  image: photo('1461896836934-ffe607ba8211'),
+  image: IMAGE('attz3xIaHFHVhx5Vj'),
   status: 'paid',
-  markers: 6,
+  markers: 4,
 }
 
 const DEXA = {
@@ -303,40 +313,55 @@ const DEXA = {
   why: 'Recommended for your age',
   price: 499,
   memberPrice: 399,
-  image: photo('1579165466991-467135ad3110'),
-  markers: 14,
+  image: IMAGE('attLrcVqxx4UMmTBA'),
+  markers: 9,
 }
 
-const HORMONE = {
-  id: 'hormone-retest',
-  name: 'Hormone & Thyroid Panel',
-  price: 249,
-  memberPrice: 199,
-  image: photo('1532187863486-abf9dbad1b69'),
-  markers: 12,
+const WBMRI = {
+  id: 'wbmri',
+  name: 'Whole Body MRI Screening (WBMRI)',
+  why: 'Recommended retesting every year',
+  price: 999,
+  memberPrice: 849,
+  image: IMAGE('att6oAYyhmwcMzs4C'),
+  markers: 4,
 }
 
 const GUT = {
   id: 'gut',
-  name: 'Gut Microbiome Test',
+  name: 'Microbiome & Gut Health Assessment',
+  why: 'Recommended retesting every year',
   price: 349,
   memberPrice: 279,
-  image: photo('1581595220892-b0739db3ba8c'),
-  markers: 20,
+  image: IMAGE('atthMpfkCA1tISA7H'),
+  markers: 30,
 }
 
-// Big profile only: recommended, but a first-time test rather than a retest, so
-// it contributes nothing to the outdated pile.
+// CT Calcium Score is itself a marker inside Heart Health, so this service does
+// refresh something — a small, honest contribution rather than a flagged
+// recommendation that moves nothing.
 const CALCIUM = {
   id: 'calcium',
   name: 'Heart Risk Snapshot (CT Calcium Score)',
-  why: 'Never tested',
+  why: 'Recommended for your age',
   price: 699,
   memberPrice: 599,
-  image: photo('1530026405186-ed1f139313f8'),
+  image: IMAGE('attfY9fUJpaq0zyB1'),
+  markers: 1,
+}
+
+// The genuinely non-contributing case: a genetic test is done once and for all,
+// so it can never be part of an outdated pile. Recommended on its own merits.
+const APOE = {
+  id: 'apoe',
+  name: 'ApoE Genetic Test',
+  why: 'Never tested',
+  price: 249,
+  memberPrice: 199,
+  image: IMAGE('attSVA4DWChdoOCLI'),
   recommended: true,
   contributesToProgress: false,
-  markers: 4,
+  markers: 1,
 }
 
 /** The member's own last test is the most recent panel they have. */
@@ -353,20 +378,23 @@ const profile = ({ panels, outdated, never, bioAgeKnown, membershipMarkers, prod
   products,
 })
 
-// Each size adds two panels to the one below it.
-const SMALL = ['heart', 'hormone', 'metabolic', 'liver']
-const MEDIUM = [...SMALL, 'cancer', 'nutrition']
-const BIG = [...MEDIUM, 'gut', 'blood']
+// Each size adds two panels to the one below it. Every preset carries at least
+// one panel a blood test cannot refresh, so the add-ons have real work to do.
+const SMALL = ['heart', 'hormone', 'metabolic', 'dexa']
+const MEDIUM = [...SMALL, 'liver', 'cancer']
+const BIG = [...MEDIUM, 'gut', 'muscle']
 
 export const PROFILES = {
   'Small — 4 panels': profile({
     panels: SMALL,
-    outdated: 36,
+    // Above the blood test's fixed 40, so even the smallest profile leaves the
+    // add-on real work to do rather than claiming to refresh more than exists.
+    outdated: 48,
     never: 3,
     bioAgeKnown: false,
-    membershipMarkers: 24,
+    membershipMarkers: BLOOD_TEST_MARKERS,
     // Simplest case: nothing prepaid, nothing non-contributing.
-    products: [DEXA, HORMONE],
+    products: [DEXA],
   }),
 
   'Medium — 6 panels': profile({
@@ -374,9 +402,9 @@ export const PROFILES = {
     outdated: 52,
     never: 4,
     bioAgeKnown: false,
-    membershipMarkers: 34,
+    membershipMarkers: BLOOD_TEST_MARKERS,
     // Adds a prepaid item.
-    products: [VO2, DEXA, HORMONE],
+    products: [VO2, DEXA, WBMRI],
   }),
 
   'Big — 8 panels': profile({
@@ -384,9 +412,9 @@ export const PROFILES = {
     outdated: 90,
     never: 6,
     bioAgeKnown: false,
-    membershipMarkers: 56,
+    membershipMarkers: BLOOD_TEST_MARKERS,
     // Adds a recommended item that contributes nothing to the outdated pile.
-    products: [VO2, DEXA, HORMONE, GUT, CALCIUM],
+    products: [VO2, DEXA, WBMRI, GUT, CALCIUM, APOE],
   }),
 }
 
