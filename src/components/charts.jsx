@@ -57,10 +57,12 @@ export function CoverageDial({ fraction, size = 96, label }) {
  * Pass `label` where it carries meaning on its own; without one it's decorative
  * and hidden from assistive tech.
  */
-export function ProgressRing({ fraction, size = 44, label }) {
+export function ProgressRing({ fraction, size = 44, label, stroke = 6 }) {
   const centre = size / 2
   const radius = size * 0.38
-  const band = 6
+  // One value for both: the dashed track and the filled arc occupy the same ring
+  // width, so the dashes stop overhanging the arc they sit against.
+  const band = stroke
 
   return (
     <svg
@@ -89,21 +91,34 @@ export function ProgressRing({ fraction, size = 44, label }) {
   )
 }
 
-/** Larger summary ring; turns into a tick once everything outdated is covered. */
-export function SummaryRing({ fraction, size = 52, label }) {
+/**
+ * Larger summary ring; turns into a tick once everything outdated is covered.
+ *
+ * `onBrand` switches it to the hero dial's treatment — white arc on translucent
+ * white ticks — for use on the brand panel, where the optimal green has nowhere
+ * near enough contrast against the red. The completion tick goes white with it,
+ * matching the arc rather than fighting it.
+ */
+export function SummaryRing({ fraction, size = 52, label, onBrand = false }) {
   const centre = size / 2
   const radius = size * 0.38
   const band = 7
   const complete = fraction >= 1
 
+  const tickStyle = onBrand
+    ? { stroke: 'rgba(255,255,255,.48)' }
+    : { className: 'text-fg-neutral-tertiary-100', stroke: 'currentColor' }
+  const arcProps = onBrand
+    ? { stroke: '#fff' }
+    : { className: 'text-fg-range-optimal-primary-100', stroke: 'currentColor' }
+
   return (
     <div style={{ flex: 'none' }}>
       <svg viewBox={`0 0 ${size} ${size}`} style={{ width: size, height: size, display: 'block' }} role="img" aria-label={label}>
-        {ticks({ centre, radius, band, count: 30, className: 'text-fg-neutral-tertiary-100', stroke: 'currentColor', strokeWidth: 1.2 })}
+        {ticks({ centre, radius, band, count: 30, strokeWidth: 1.2, ...tickStyle })}
         {fraction > 0 && (
           <circle
-            className="text-fg-range-optimal-primary-100"
-            stroke="currentColor"
+            {...arcProps}
             cx={centre}
             cy={centre}
             r={radius}
@@ -115,10 +130,9 @@ export function SummaryRing({ fraction, size = 52, label }) {
         )}
         {complete && (
           <path
-            className="text-fg-range-optimal-primary-100"
+            {...arcProps}
             d={`M${centre - 6} ${centre} l4.5 4.5 L${centre + 7} ${centre - 5}`}
             fill="none"
-            stroke="currentColor"
             strokeWidth="2.2"
             strokeLinecap="round"
             strokeLinejoin="round"

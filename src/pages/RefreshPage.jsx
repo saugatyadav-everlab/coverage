@@ -4,9 +4,11 @@ import { useNavigate } from 'react-router-dom'
 import { DS } from '../ds/loadDs'
 import { PageShell } from '../components/PageShell'
 import { ProductCard } from '../components/ProductCard'
+import { MembershipCard } from '../components/MembershipCard'
 import { AtHomeAddOn } from '../components/AtHomeAddOn'
 import { MobileSummaryBar, mobileBarVariant } from '../components/MobileSummaryBar'
 import { CoverageSummaryCard, SummaryLineItems, TotalsCard } from '../components/SummaryParts'
+import { SectionHeading } from '../components/CardParts'
 import { useCoverage } from '../data/CoverageProvider'
 import { computeSelection } from '../data/products'
 import { AT_HOME } from '../data/atHome'
@@ -27,12 +29,14 @@ function withPricing(product, isMember, money) {
   return { ...product, priceToShow, priceSubtitle }
 }
 
-function SummaryPanel({ selection, membership, money, onCheckout, checkoutLabel }) {
-  const lines = summaryLines(selection, membership, money)
+function SummaryPanel({ selection, membership, money, order, onCheckout, checkoutLabel }) {
+  const lines = summaryLines(selection, membership, money, order)
 
   return (
     <div className="side">
-      <div className="seclabel typography-body-400-medium">Summary</div>
+      {/* Same treatment as the two section headings in the left column. */}
+      <SectionHeading>Summary</SectionHeading>
+
       {/* Both of these move into the sticky bar on narrow layouts — see app.css. */}
       <div className="side-coverage">
         <CoverageSummaryCard selection={selection} />
@@ -65,7 +69,17 @@ export default function RefreshPage() {
   const [membershipSelected, setMembershipSelected] = useState(false)
   const [atHomeSelected, setAtHomeSelected] = useState(false)
   const [selectedIds, setSelectedIds] = useState([])
+  // The sequence everything was picked in, so the summary can list it that way.
+  // Kept alongside the selection flags rather than replacing them: the plan and
+  // its at-home draw have their own rules, and this only records the order.
+  const [order, setOrder] = useState([])
   const barVariant = mobileBarVariant()
+
+  const mark = (key, on) =>
+    setOrder((current) => {
+      const without = current.filter((k) => k !== key)
+      return on ? [...without, key] : without
+    })
 
   const money = useMemo(
     () => (amount) => formatMoney(amount, { currency: payload.currency, locale: payload.locale }),
@@ -88,14 +102,27 @@ export default function RefreshPage() {
 
   // Dropping the plan drops its add-on with it, so re-selecting the plan never
   // silently re-adds a charge the member last saw attached to something else.
-  const toggleMembership = () =>
-    setMembershipSelected((on) => {
-      if (on) setAtHomeSelected(false)
-      return !on
-    })
+  const toggleMembership = () => {
+    const on = !membershipSelected
+    setMembershipSelected(on)
+    mark('membership', on)
+    if (!on) {
+      setAtHomeSelected(false)
+      mark(AT_HOME.id, false)
+    }
+  }
 
-  const toggleProduct = (id) =>
-    setSelectedIds((current) => (current.includes(id) ? current.filter((x) => x !== id) : [...current, id]))
+  const toggleAtHome = () => {
+    const on = !atHomeSelected
+    setAtHomeSelected(on)
+    mark(AT_HOME.id, on)
+  }
+
+  const toggleProduct = (id) => {
+    const on = !selectedIds.includes(id)
+    setSelectedIds(on ? [...selectedIds, id] : selectedIds.filter((x) => x !== id))
+    mark(id, on)
+  }
 
   /**
    * The checkout button hands off to the embedding app, which opens its own
@@ -130,11 +157,13 @@ export default function RefreshPage() {
   const priced = products.map((product) => withPricing(product, selection.isMember, money))
   const membershipCard = membership ? withPricing(membership, selection.isMember, money) : null
 
-  // `recommended` decides which of the comps' two sections an item sits in.
-  // An item can be recommended and still contribute nothing to the outdated
-  // pile — a first-time test belongs under "Recommended" just as much.
-  const recommended = priced.filter((product) => product.recommended)
-  const further = priced.filter((product) => !product.recommended)
+  // Ordered by what each item actually does about the gap: biggest contribution
+  // first, already-paid last since they need no decision. `recommended` is a
+  // badge on the card, not a position — leading with an item that refreshes
+  // nothing, above one that closes thirty markers, reads as incoherent.
+  const addons = [...priced].sort(
+    (a, b) => Number(a.paid) - Number(b.paid) || b.contribution - a.contribution,
+  )
 
   const renderCard = (product) => (
     <ProductCard
@@ -157,38 +186,37 @@ export default function RefreshPage() {
       <div className="page page--refresh">
         <div style={{ maxWidth: 1180, margin: '0 auto' }} data-mobilebar={barVariant}>
           <div style={{ padding: '30px 0 26px' }}>
-            <div className="pagetitle typography-display-300">Refresh your outdated biomarkers</div>
+            <div className="pagetitle typography-display-300">Refresh your biomarkers</div>
           </div>
 
           <div className="cols">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
-              {(membershipCard || recommended.length > 0) && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  {membershipCard && (
-                    <ProductCard
+            <div className="rcolumn">
+              {membershipCard && (
+                <div className="rsection">
+                  {/* The plan and its delivery option share one frame, so the
+                      at-home draw reads as part of the same offer rather than a
+                      separate purchase. */}
+                  <div className="baseline-frame bg-bg-surface-200 rounded-3xl" data-on={membershipSelected ? '1' : '0'}>
+                    <MembershipCard
                       product={membershipCard}
                       outdatedTotal={selection.outdatedTotal}
                       selected={membershipSelected}
                       onToggle={toggleMembership}
                       money={money}
-                      footerExtra={
-                        <AtHomeAddOn
-                          open={membershipSelected}
-                          selected={atHomeSelected}
-                          onToggle={() => setAtHomeSelected((on) => !on)}
-                          money={money}
-                        />
-                      }
                     />
-                  )}
-                  {recommended.map(renderCard)}
+                    <AtHomeAddOn
+                      open={membershipSelected}
+                      selected={atHomeSelected}
+                      onToggle={toggleAtHome}
+                    />
+                  </div>
                 </div>
               )}
 
-              {further.length > 0 && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                  <div className="seclabel typography-body-400-medium">Go further for full coverage</div>
-                  {further.map(renderCard)}
+              {addons.length > 0 && (
+                <div className="rsection">
+                  <SectionHeading>Go further for full coverage</SectionHeading>
+                  <div className="rcards">{addons.map(renderCard)}</div>
                 </div>
               )}
             </div>
@@ -197,6 +225,7 @@ export default function RefreshPage() {
               selection={selection}
               membership={membershipCard}
               money={money}
+              order={order}
               onCheckout={handleCheckout}
               checkoutLabel="Continue to checkout"
             />
@@ -205,7 +234,7 @@ export default function RefreshPage() {
           <MobileSummaryBar
             variant={barVariant}
             selection={selection}
-            lines={summaryLines(selection, membershipCard, money)}
+            lines={summaryLines(selection, membershipCard, money, order)}
             money={money}
             onCheckout={handleCheckout}
           />

@@ -6,19 +6,33 @@ import { BasketIcon, CheckIcon } from './icons'
  * narrow-layout sticky bar so the two are identical rather than merely similar.
  */
 
-/** Ring, count and label. */
+/**
+ * Ring, count and label, on the same brand panel as the Bridge hero — the
+ * coverage number is the one thing carried across both pages, so it wears the
+ * same clothes in both places.
+ */
 export function CoverageSummaryCard({ selection }) {
   const { refreshed, outdatedTotal, fraction } = selection
 
   return (
     <div
-      className="rounded-2xl border-br-neutral-tertiary-100"
-      style={{ borderWidth: 1, borderStyle: 'solid', padding: 18, display: 'flex', alignItems: 'center', gap: 16 }}
+      className="coverage-card theme-dark rounded-2xl"
+      style={{
+        color: '#fff',
+        padding: 18,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 16,
+        backgroundColor: '#5a2716',
+        backgroundImage: 'url(/assets/brand-texture.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+      }}
     >
-      <SummaryRing fraction={fraction} label={`${refreshed} of ${outdatedTotal} outdated biomarkers refreshed`} />
+      <SummaryRing onBrand fraction={fraction} label={`${refreshed} of ${outdatedTotal} outdated biomarkers refreshed`} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div className="typography-display-100">{refreshed}</div>
-        <div className="text-fg-neutral-secondary-100 typography-body-200-regular" style={{ marginTop: 3, lineHeight: 1.4 }}>
+        <div className="typography-body-200-regular" style={{ marginTop: 3, lineHeight: 1.4, opacity: 0.72 }}>
           Outdated biomarkers being refreshed
         </div>
       </div>

@@ -168,7 +168,6 @@ export function computeSelection({
   atHome = null,
   atHomeSelected = false,
 }) {
-  const selected = new Set(selectedIds)
   const isMember = Boolean(membershipSelected)
 
   // The at-home draw only exists as an option on the plan, so it can't be
@@ -176,7 +175,9 @@ export function computeSelection({
   const atHomeCharged = Boolean(atHome && isMember && atHomeSelected)
 
   const paid = products.filter((p) => p.paid)
-  const chosen = products.filter((p) => !p.paid && selected.has(p.id))
+  // Ordered by when each was picked, not by where it sits in the catalogue, so
+  // the summary grows downward as the member adds things.
+  const chosen = selectedIds.map((id) => products.find((p) => p.id === id)).filter((p) => p && !p.paid)
 
   const priceOf = (product) => (isMember ? product.memberPrice : product.price)
 

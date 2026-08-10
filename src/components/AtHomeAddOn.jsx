@@ -1,29 +1,30 @@
+import { DS } from '../ds/loadDs'
 import { CheckIcon } from './icons'
 import { AT_HOME } from '../data/atHome'
 
 /**
- * The at-home draw row inside the Baseline card.
+ * The at-home draw, offered alongside the Baseline card inside the same tinted
+ * frame (Figma 315:70020) — same draw, delivered at home rather than a clinic.
  *
- * Always mounted so it can animate both in and out; `data-open` drives a
- * grid-template-rows transition (see .athome in app.css). Its checkbox is a
- * rounded square to distinguish it from the circular plan-level control — it
- * toggles independently of the card, so the click must not bubble up and
- * deselect the plan underneath.
+ * It is a delivery choice, not a test: ticking it adds to the total but leaves
+ * the coverage ring alone. It only exists once the plan is chosen, so it is
+ * revealed on selection rather than sitting there unavailable. Always mounted so
+ * it can animate both ways.
  */
-export function AtHomeAddOn({ open, selected, onToggle, money }) {
+export function AtHomeAddOn({ open, selected, onToggle }) {
   const handle = (event) => {
     event.stopPropagation()
-    onToggle()
+    if (open) onToggle()
   }
 
   return (
     <div className="athome" data-open={open ? '1' : '0'} aria-hidden={!open}>
       <div>
         <div
-          className="athome-row border-br-neutral-tertiary-100"
+          className="athome-row"
           role="checkbox"
           aria-checked={selected}
-          aria-label={`${AT_HOME.name} — ${money(AT_HOME.price)}`}
+          aria-label={AT_HOME.name}
           tabIndex={open ? 0 : -1}
           onClick={handle}
           onKeyDown={(event) => {
@@ -33,46 +34,25 @@ export function AtHomeAddOn({ open, selected, onToggle, money }) {
             }
           }}
         >
-          <span
-            className="rounded-lg bg-bg-neutral-tertiary-200 text-fg-neutral-primary-100"
-            style={{ flex: 'none', width: 44, height: 44, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-            aria-hidden="true"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" style={{ width: 20, height: 20 }}>
-              <path d="M3.5 10.4 12 3.8l8.5 6.6" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M5.6 12v7.4h12.8V12" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
+          <span className="athome-icon bg-bg-surface-100 text-fg-neutral-primary-100" aria-hidden="true">
+            <DS.IconHome size={18} />
           </span>
 
           <div style={{ flex: 1, minWidth: 0 }}>
             <div className="typography-body-300-medium">{AT_HOME.name}</div>
-            <div className="text-fg-neutral-tertiary-100 typography-body-200-regular" style={{ marginTop: 3 }}>
+            <div className="text-fg-neutral-secondary-100 typography-body-200-regular" style={{ marginTop: 4 }}>
               {AT_HOME.description}
             </div>
           </div>
 
-          <span className="typography-body-300-medium" style={{ flex: 'none' }}>
-            {money(AT_HOME.price)}
-          </span>
-
           <span
             className={
               selected
-                ? 'rounded-lg bg-bg-neutral-primary-100 text-fg-neutral-primary-invert-100'
-                : 'rounded-lg border-br-neutral-secondary-100'
+                ? 'athome-check bg-bg-neutral-primary-100 text-fg-neutral-primary-invert-100'
+                : 'athome-check athome-check--empty border-br-neutral-secondary-100'
             }
-            style={{
-              flex: 'none',
-              width: 24,
-              height: 24,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderWidth: selected ? 0 : 1.4,
-              borderStyle: 'solid',
-            }}
           >
-            {selected && <CheckIcon size={13} />}
+            {selected && <CheckIcon size={12} />}
           </span>
         </div>
       </div>

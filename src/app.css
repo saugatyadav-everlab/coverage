@@ -403,85 +403,273 @@ html[data-embedded='1'] .shell {
   gap: 16px;
 }
 
+/* Sections are set well apart; cards within one sit close together. */
+.rcolumn {
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+.rsection {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.rsection-head {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.rsection-head > :first-child {
+  flex: 1;
+  min-width: 0;
+}
+.rcards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Shared card shell — Figma 315:70020. */
 .card {
   cursor: pointer;
-  border-width: 1px;
-  border-style: solid;
   transition: border-color 0.14s ease, box-shadow 0.14s ease;
   width: 100%;
-  background: transparent;
   color: inherit;
   font: inherit;
   text-align: left;
   display: block;
 }
-.card[data-on='1'] {
-  box-shadow: inset 0 0 0 1px currentColor;
+.rcard {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
 }
-.card:hover {
-  border-color: var(--ds-color-br-neutral-secondary-100);
-}
-
-.chead {
-  padding: 20px 20px 0;
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-areas: 'tile meta check';
+.rcard-head {
+  display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 12px;
 }
-.cmeta {
-  grid-area: meta;
-  min-width: 0;
-}
-.cbox {
-  grid-area: check;
-  justify-self: end;
-  align-self: start;
-}
-.mtile {
-  grid-area: tile;
-  justify-self: start;
-  height: 64px;
-  aspect-ratio: 1.75;
-}
-.atile {
-  grid-area: tile;
-  justify-self: start;
+.rcard-media {
+  flex: none;
   width: 64px;
   height: 64px;
-  overflow: hidden;
+  object-fit: cover;
+  display: block;
 }
-
-.cfoot {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  grid-template-areas: 'ring markers price';
-  align-items: center;
-  gap: 16px;
-  padding: 14px 20px;
+.rcard-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+/* Figma 330:76190. Wide layouts put the price opposite the name, so the head
+   row carries the whole offer; narrow ones fall back to the footer copy. */
+.rcard-head-price {
+  flex: none;
+  text-align: right;
+}
+/* Both are mobile-only: wide layouts click the card itself and keep the footer
+   on one line. */
+.rcard-foot-rule,
+.rcard-add {
+  display: none;
+}
+.rcard-rule {
+  height: 0;
   border-top-width: 1px;
   border-top-style: solid;
 }
-.cring {
-  grid-area: ring;
+.rcard-foot {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.rcard-refresh {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+/* The plus sits inside the ring rather than beside it. */
+.rcard-contrib {
+  flex: none;
+  position: relative;
   display: flex;
 }
-.cmk {
-  grid-area: markers;
-  min-width: 0;
+.rcard-contrib-plus {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-.cfr {
-  grid-area: price;
+.rcard-count {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rcard-price {
+  display: none;
+  flex: none;
   text-align: right;
 }
-.cdiv {
-  display: none;
+/* The tick rides with the word, so it stays put whichever side the price is
+   aligned to. */
+.rcard-paid {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
-.addbtn {
-  display: none;
-  grid-area: add;
-  justify-self: end;
+
+/* Add-on cards carry the border; the Baseline card sits on the tinted frame. */
+.pcard {
+  border-width: 2px;
+  border-style: solid;
+}
+.pcard--on {
+  border-color: var(--ds-color-br-neutral-primary-100);
+}
+
+/* ---------- Refresh: the Baseline offer ---------- */
+
+/* The plan card and the at-home row share one frame. */
+/* The frame carries the selection, not the card inside it — the plan and its
+   at-home option are one offer, so the boundary has to enclose both. */
+.baseline-frame {
+  border-width: 2px;
+  border-style: solid;
+  border-color: var(--ds-color-br-neutral-tertiary-100);
+  transition: border-color 0.14s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.02)) drop-shadow(0 8px 6px rgba(0, 0, 0, 0.02));
+}
+.baseline-frame[data-on='1'] {
+  border-color: var(--ds-color-br-neutral-primary-100);
+}
+/* Borderless: the frame around it shows the selection. Background comes from
+   the card component's invert token rather than a raw surface. */
+.mcard {
+  background: var(--ds-color-components-card-invert-bg);
+  box-shadow: 0 8px 10px -6px rgba(0, 0, 0, 0.02), 0 20px 25px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Everything the membership brings, set apart from the test itself. Set here
+   rather than as a class: the DS ships the token but no utility for it. */
+.mcard-included {
+  background: var(--ds-color-bg-surface-neutral-white-100);
+  padding: 16px;
+}
+.mcard-member {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0 16px;
+}
+/* The member card artwork, at the wide aspect it is drawn in. The PNG carries
+   its own corner radius, so nothing is applied on top of it. */
+.mcard-membercard {
+  flex: none;
+  /* 32px tall at the artwork's own 1.75 aspect. */
+  width: 56px;
+  height: 32px;
+  background-image: url(/assets/membership-card.png);
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+/* Desktop reads it as one sentence; mobile stacks it (Figma 315:72807). */
+.mcard-member-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.mcard-member-text > * {
+  font: var(--ds-typography-font-body-300-medium);
+  letter-spacing: var(--ds-letter-spacing-typography-font-body-300-medium);
+}
+.mcard-perk {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 0;
+  border-top-width: 1px;
+  border-top-style: solid;
+}
+/* No rule between the membership line and the first thing it includes. */
+.mcard-perk[data-first='1'] {
+  border-top-width: 0;
+}
+
+/* Hover shows what picking a card would look like, so it borrows the selected
+   border. Gated to real pointers: a touch device holds :hover on the last thing
+   tapped, which would leave a deselected card still looking selected. */
+@media (hover: hover) and (pointer: fine) {
+  .pcard:hover,
+  .baseline-frame:hover {
+    border-color: var(--ds-color-br-neutral-primary-100);
+  }
+}
+
+/* ---------- Refresh: at-home draw ---------- */
+
+/* Revealed once the plan is selected. Animating grid-template-rows from 0fr to
+   1fr transitions to the row's natural height without hardcoding one. */
+.athome {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.28s ease;
+}
+.athome > div {
+  overflow: hidden;
+}
+.athome[data-open='1'] {
+  grid-template-rows: 1fr;
+}
+.athome-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  /* Equal breathing room above and below: the space to the card and the space
+     to the frame's bottom edge should read the same. */
+  padding: 20px 16px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.athome-icon {
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px -1px rgba(0, 0, 0, 0.06), 0 1px 3px 0 rgba(0, 0, 0, 0.06);
+}
+.athome-check {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.athome-check--empty {
+  border-width: 1.5px;
+  border-style: solid;
+}
+
+/* Ring on the right in the sticky column; the narrow-layout bar keeps it on the
+   left, where it leads the row. */
+.side-coverage .coverage-card {
+  flex-direction: row-reverse;
 }
 
 .sumitem {
@@ -505,118 +693,65 @@ html[data-embedded='1'] .shell {
     position: static;
     gap: 12px;
   }
-  .chead {
+  .rcolumn {
+    gap: 40px;
+  }
+  .rcard {
+    gap: 16px;
+    padding: 16px;
+  }
+  /* Stacked, at the sizes from Figma 315:72807. */
+  .mcard-member-text {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+  .mcard-member-text > :first-child {
+    font: var(--ds-typography-font-body-100-regular);
+    letter-spacing: var(--ds-letter-spacing-typography-font-body-100-regular);
+  }
+  .mcard-member-text > :last-child {
+    font: var(--ds-typography-font-body-200-medium);
+    letter-spacing: var(--ds-letter-spacing-typography-font-body-200-medium);
+  }
+  /* The price drops to the footer, next to the Add button, leaving the image
+     and the name side by side. */
+  .rcard-head-price {
+    display: none;
+  }
+  /* Refresh line, rule, then price against an Add button. */
+  .rcard-foot {
+    display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     grid-template-areas:
-      'tile check'
-      'meta meta';
-    align-items: start;
-    gap: 14px;
-    padding: 16px 16px 0;
+      'refresh refresh'
+      'rule rule'
+      'price add';
+    align-items: center;
+    gap: 20px 12px;
   }
-  .mtile {
-    height: 56px;
+  .rcard-refresh {
+    grid-area: refresh;
   }
-  .atile {
-    width: 58px;
-    height: 58px;
-  }
-  .cfoot {
-    grid-template-columns: 34px minmax(0, 1fr) auto;
-    grid-template-areas:
-      'ring markers markers'
-      'div div div'
-      'price price add';
-    gap: 0 14px;
-    padding: 12px 16px 14px;
-  }
-  .cfoot .cring svg {
-    width: 34px;
-    height: 34px;
-  }
-  .cdiv {
+  .rcard-foot-rule {
     display: block;
-    grid-area: div;
+    grid-area: rule;
     height: 0;
-    margin: 12px 0;
     border-top-width: 1px;
     border-top-style: solid;
   }
-  .cfr {
-    justify-self: start;
+  .rcard-price {
+    display: block;
+    grid-area: price;
     text-align: left;
   }
-  .addbtn {
+  .rcard-add {
     display: flex;
+    grid-area: add;
+    justify-self: end;
   }
-}
-
-/* ---------- Preview-only viewport switcher (?preview=1) ---------- */
-
-.vpbtn {
-  position: fixed;
-  left: 16px;
-  bottom: 16px;
-  z-index: 60;
-  display: flex;
-  gap: 2px;
-  padding: 3px;
-  border-radius: 999px;
-  background: rgba(128, 128, 128, 0.16);
-  backdrop-filter: blur(8px);
-}
-.vpbtn button {
-  border: 0;
-  cursor: pointer;
-  font-family: 'Saans', system-ui;
-  font-size: 12px;
-  padding: 6px 13px;
-  border-radius: 999px;
-  background: transparent;
-  color: inherit;
-  opacity: 0.6;
-}
-.vpbtn button[data-on='1'] {
-  background: var(--ds-color-bg-neutral-primary-invert-100);
-  opacity: 1;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
-}
-
-/* ---------- Refresh: at-home draw add-on ---------- */
-
-/* Revealed once the plan is selected. Animating grid-template-rows from 0fr to
-   1fr transitions to the row's natural height without hardcoding one. */
-.athome {
-  display: grid;
-  grid-template-rows: 0fr;
-  opacity: 0;
-  transition: grid-template-rows 0.28s ease, opacity 0.2s ease;
-}
-.athome > div {
-  overflow: hidden;
-}
-.athome[data-open='1'] {
-  grid-template-rows: 1fr;
-  opacity: 1;
-}
-
-.athome-row {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 14px 20px;
-  border-top-width: 1px;
-  border-top-style: solid;
-  cursor: pointer;
-}
-.athome-row:hover {
-  background: var(--ds-color-bg-neutral-tertiary-200);
-}
-
-@container (max-width: 1040px) {
   .athome-row {
-    padding: 14px 16px;
-    gap: 12px;
+    padding: 14px 14px 16px;
   }
 }
 
