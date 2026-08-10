@@ -92,9 +92,8 @@ percentage and the ring from it. **Never send a percentage.**
   { "id": "vo2",  "name": "VO2 Max", "price": 399, "memberPrice": 299,
     "markers": 8, "status": "paid" },          // locked; already in the ring
 
-  { "id": "calcium", "name": "CT Calcium Score", "why": "Never tested",
-    "price": 699, "memberPrice": 599, "markers": 4,
-    "recommended": true,                        // sits under "Recommended"
+  { "id": "apoe", "name": "ApoE Genetic Test", "why": "Never tested",
+    "price": 249, "memberPrice": 199, "markers": 1,
     "contributesToProgress": false }            // "Outside your outdated markers"
 ]
 ```
@@ -105,14 +104,26 @@ percentage and the ring from it. **Never send a percentage.**
   contribution is in the summary ring from first paint.
 - `contributesToProgress: false` — a new test rather than a retest. The card
   still shows its marker count; the ring doesn't move.
-- `recommended: true` — puts it in the **Recommended** section rather than
-  **Go further for full coverage**. Independent of contribution: an item that
-  refreshes nothing can still be recommended.
-- If you omit `recommended` everywhere, the page derives it from the panel data
-  with a greedy pass — the items that newly cover the most outdated markers.
+- `why` — your sub-line under the name, verbatim. Nothing is generated; a
+  product without one renders with no sub-line at all.
+- `recommended: true` — currently has **no visual effect**. The Recommended
+  section was removed; every add-on now sits under **Go further for full
+  coverage**, ordered by contribution with paid items last. The flag only
+  switches off the greedy derivation described below. Kept in the schema
+  because the section may come back.
 - If you omit `markers` but pass `covers: { panels: ["hormone"] }`, the count is
   derived from that panel's outdated markers, and overlapping items are
   de-duplicated instead of double-counted.
+
+### The at-home draw
+
+One charged item is **not** in the payload: the at-home blood draw
+([`src/data/atHome.js`](src/data/atHome.js), $79). It belongs to the Baseline
+plan rather than being a product of its own — it appears inside the plan's card,
+is revealed only once the plan is selected, and is dropped again if the plan is
+deselected. It adds to the total but contributes no markers, so the coverage
+ring does not move when it's ticked. Lift it into the payload (e.g.
+`membership.atHome`) if the price ever needs to vary by member.
 
 ### Pricing rules
 
@@ -123,7 +134,7 @@ price and the saving shows as its own **Member discount** line, so
 never discounted. Paid items never touch the money.
 
 These rules are pinned by assertions in
-[`src/data/products.test.js`](src/data/products.test.js) — 13 cases covering
+[`src/data/products.test.js`](src/data/products.test.js) — 18 cases covering
 membership toggling in and out of a populated cart, prepaid items, missing
 member prices, zero-marker tests, non-contributing tests, and the progress cap.
 Run them from the test console, or in any browser console on the dev server:
@@ -139,13 +150,21 @@ Resolution order — first hit wins:
 | Source | When to use |
 | --- | --- |
 | `postMessage` | **Production.** No size limit, no CORS, and biomarker values never touch browser history, server logs or `Referer` headers. |
-| `?d=<gzip+base64url>` | Standalone or shareable links. ~500 markers ≈ 1.5KB. Keep the whole URL under 8KB. |
+| `?d=<gzip+base64url>` | Standalone or shareable links. The largest fixture — 8 panels, 124 markers — is 9.3KB of JSON and 3.2KB in the URL. Keep the whole URL under 8KB. |
 | `?data=<base64url>` | Same, uncompressed — readable while debugging. |
 | `?src=<url>` | Page fetches the JSON itself. Needs CORS. |
 | demo payload | Dev, or `?demo=1`. |
 
 Health data in a query string is a real leak even when it fits, which is why
 `postMessage` is the recommendation rather than just the default.
+
+Independent of the source, either page also accepts:
+
+| Flag | Effect |
+| --- | --- |
+| `?theme=light\|dark` | Overrides both the host theme message and the OS preference |
+| `?timeout=8000` | How long to wait for the host's payload before erroring. Default 8000ms |
+| `?preview=1` | Adds the comps' desktop/mobile switcher |
 
 ### postMessage contract
 
@@ -165,6 +184,7 @@ same name on `window`, for non-iframe embeds:
 | `everlab:coverage:resize` | `{ height }` — size the iframe, no nested scrollbar |
 | `everlab:coverage:close` | The X was pressed |
 | `everlab:coverage:navigate` | `{ page: 'bridge' \| 'refresh' }` |
+| `everlab:coverage:scrolltop` | Route changed — scroll your frame back to the top |
 | `everlab:refresh:checkout` | `{ selection, totals, coverage }` — **open your modal here** |
 
 The page replies to the exact origin that sent it data. Set `VITE_HOST_ORIGIN`
@@ -176,11 +196,15 @@ event and your app takes over.
 ## Testing
 
 `/embed-example.html` is a test console and doubles as the integration
-reference — the `handlers` block in it is exactly what a host needs.
+reference — its `window.addEventListener('message', …)` switch is exactly what a
+host needs, including the line where your checkout modal opens. Everything else
+in the file is test scaffolding.
 
 - Edit the payload JSON on the left, hit **Send**, watch the pages re-render.
-- Scenario presets: default, everything up to date, no products, only
-  non-contributing items, 24 panels / 480 markers, panel images on.
+- Three scenario presets built from Everlab's real panels and markers: **Small**
+  (4 panels), **Medium** (6, adds a prepaid item), **Big** (8, adds a
+  non-contributing item). Panel dates are derived from today, so no fixture
+  goes stale.
 - Live size readout: raw JSON vs. the `?d=` value, so you can see URL headroom.
 - **Open as ?d= URL** tests the standalone path in a new tab.
 - **Run tests** runs the pricing assertions.
@@ -196,9 +220,9 @@ npm run encode -- ./payload.json https://coverage.example.com/
 Prints the `?d=` value, the full URL and the compression ratio, and exits
 non-zero if the URL would exceed 8KB.
 
-Add `?preview=1` to either page for the comps' desktop/mobile switcher —
-breakpoints are container queries on the shell, so it reflects the real iframe
-width rather than the window.
+Breakpoints are container queries on the shell, so they follow the real iframe
+width rather than the window — a narrow frame on a desktop gets the narrow
+layout. Resize the frame in the console, or use `?preview=1`, to check.
 
 ## Deploying to Cloudflare Pages
 
