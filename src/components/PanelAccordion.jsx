@@ -122,7 +122,9 @@ function PanelRow({ panel, open, onToggle }) {
 }
 
 export function PanelAccordion({ panels }) {
-  const [openId, setOpenId] = useState(() => panels[0]?.id ?? null)
+  // Everything starts closed: the list is the overview, and pre-opening the
+  // first panel gives it a prominence the host's ordering never asked for.
+  const [openId, setOpenId] = useState(null)
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
