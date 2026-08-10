@@ -558,11 +558,15 @@ html[data-embedded='1'] .shell {
   box-shadow: 0 8px 10px -6px rgba(0, 0, 0, 0.02), 0 20px 25px -5px rgba(0, 0, 0, 0.04);
 }
 
-/* Everything the membership brings, set apart from the test itself. Set here
-   rather than as a class: the DS ships the token but no utility for it. */
+/* Everything the membership brings, set apart from the test itself. A literal
+   tint rather than a surface token: every token at this step resolves to the
+   same value as the card behind it, which erases the nesting. */
 .mcard-included {
-  background: var(--ds-color-bg-surface-neutral-white-100);
+  background: rgba(0, 0, 0, 0.03);
   padding: 16px;
+}
+.theme-dark .mcard-included {
+  background: rgba(255, 255, 255, 0.05);
 }
 .mcard-member {
   display: flex;
@@ -780,23 +784,6 @@ html[data-embedded='1'] .shell {
   .mobilebar .footin {
     gap: 14px;
   }
-  .mobilebar-toggle {
-    border: 0;
-    padding: 0;
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
-  }
-  .mobilebar-sheet {
-    max-height: 46vh;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding-bottom: 14px;
-  }
   .mobilebar .footcta {
     flex: 1 0 100%;
     width: 100%;
@@ -810,10 +797,6 @@ html[data-embedded='1'] .shell {
   .side-coverage,
   .side-cta {
     display: none !important;
-  }
-  /* The sheet variant's fold-out is that breakdown, so the column goes entirely. */
-  [data-mobilebar='sheet'] .side {
-    display: none;
   }
 }
 

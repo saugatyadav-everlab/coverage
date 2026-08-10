@@ -6,7 +6,7 @@ import { PageShell } from '../components/PageShell'
 import { ProductCard } from '../components/ProductCard'
 import { MembershipCard } from '../components/MembershipCard'
 import { AtHomeAddOn } from '../components/AtHomeAddOn'
-import { MobileSummaryBar, mobileBarVariant } from '../components/MobileSummaryBar'
+import { MobileSummaryBar } from '../components/MobileSummaryBar'
 import { CoverageSummaryCard, SummaryLineItems, TotalsCard } from '../components/SummaryParts'
 import { SectionHeading } from '../components/CardParts'
 import { useCoverage } from '../data/CoverageProvider'
@@ -73,7 +73,6 @@ export default function RefreshPage() {
   // Kept alongside the selection flags rather than replacing them: the plan and
   // its at-home draw have their own rules, and this only records the order.
   const [order, setOrder] = useState([])
-  const barVariant = mobileBarVariant()
 
   const mark = (key, on) =>
     setOrder((current) => {
@@ -184,7 +183,7 @@ export default function RefreshPage() {
       }}
     >
       <div className="page page--refresh">
-        <div style={{ maxWidth: 1180, margin: '0 auto' }} data-mobilebar={barVariant}>
+        <div style={{ maxWidth: 1180, margin: '0 auto' }}>
           <div style={{ padding: '30px 0 26px' }}>
             <div className="pagetitle typography-display-300">Refresh your biomarkers</div>
           </div>
@@ -231,13 +230,7 @@ export default function RefreshPage() {
             />
           </div>
 
-          <MobileSummaryBar
-            variant={barVariant}
-            selection={selection}
-            lines={summaryLines(selection, membershipCard, money, order)}
-            money={money}
-            onCheckout={handleCheckout}
-          />
+          <MobileSummaryBar selection={selection} onCheckout={handleCheckout} />
         </div>
       </div>
     </PageShell>
