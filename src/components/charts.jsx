@@ -96,13 +96,18 @@ export function ProgressRing({ fraction, size = 44, label, stroke = 6 }) {
  *
  * `onBrand` switches it to the hero dial's treatment — white arc on translucent
  * white ticks — for use on the brand panel, where the optimal green has nowhere
- * near enough contrast against the red. The completion tick goes white with it,
- * matching the arc rather than fighting it.
+ * near enough contrast against the red.
+ *
+ * At 100% the green variant becomes a solid badge: green disc, white tick. The
+ * brand variant stays a ring, since a white disc has nothing to show against a
+ * white arc. Either way the tick is white.
  */
 export function SummaryRing({ fraction, size = 52, label, onBrand = false }) {
   const centre = size / 2
   const radius = size * 0.38
-  const band = 7
+  // Everything scales off the ring, so both sizes read the same.
+  const scale = size / 52
+  const band = 7 * scale
   const complete = fraction >= 1
 
   const tickStyle = onBrand
@@ -128,12 +133,26 @@ export function SummaryRing({ fraction, size = 52, label, onBrand = false }) {
             transform={`rotate(-90 ${centre} ${centre})`}
           />
         )}
+        {/* Completion is a solid badge. The ring's centre is transparent, so at
+            100% it showed the bar's white background through the middle; filling
+            it means the tick has to go white to stay visible. On brand the disc
+            would vanish into the white arc, so there the tick stays on the ring. */}
+        {complete && !onBrand && (
+          <circle
+            className="text-fg-range-optimal-primary-100"
+            cx={centre}
+            cy={centre}
+            r={radius + band / 2}
+            fill="currentColor"
+            stroke="none"
+          />
+        )}
         {complete && (
           <path
-            {...arcProps}
-            d={`M${centre - 6} ${centre} l4.5 4.5 L${centre + 7} ${centre - 5}`}
+            stroke="#fff"
+            d={`M${centre - 6 * scale} ${centre} l${4.5 * scale} ${4.5 * scale} L${centre + 7 * scale} ${centre - 5 * scale}`}
             fill="none"
-            strokeWidth="2.2"
+            strokeWidth={2.2 * scale}
             strokeLinecap="round"
             strokeLinejoin="round"
           />
