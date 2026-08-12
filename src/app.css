@@ -463,12 +463,11 @@ html[data-embedded='1'] .shell {
   display: flex;
   flex-direction: column;
 }
-/* The selection circle closes the title row at both widths. It sits against the
-   top of the row rather than centring on it: the row's height is set by the
+/* The selection circle closes the title row at both widths. It sits flush with
+   the top of the row rather than centring on it: the row's height is set by the
    64px image, so a centred circle drifts away from the name it belongs to. */
 .rcard-head > .selcircle {
   align-self: flex-start;
-  margin-top: 4px;
 }
 .selcircle {
   flex: none;
