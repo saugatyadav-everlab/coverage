@@ -12,11 +12,14 @@
  * deploy.
  */
 export const AT_HOME = {
+  // Hidden for now. Nothing else is stripped: flipping this back to true
+  // restores the row, the charge and the summary line as they were.
+  enabled: false,
   id: 'at-home-draw',
   // Full name on the card; the shorter label is what the summary lists, where
   // the row has to sit alongside product names in a narrow column.
   name: 'Get your blood drawn at home',
   summaryName: 'At-home pathology',
   description: 'Skip the clinic and waiting.',
-  price: 79,
+  price: 75,
 }

@@ -93,7 +93,7 @@ export default function RefreshPage() {
         outdated,
         selectedIds,
         membershipSelected,
-        atHome: AT_HOME,
+        atHome: AT_HOME.enabled ? AT_HOME : null,
         atHomeSelected,
       }),
     [membership, products, outdated, selectedIds, membershipSelected, atHomeSelected],
@@ -203,11 +203,9 @@ export default function RefreshPage() {
                       onToggle={toggleMembership}
                       money={money}
                     />
-                    <AtHomeAddOn
-                      open={membershipSelected}
-                      selected={atHomeSelected}
-                      onToggle={toggleAtHome}
-                    />
+                    {AT_HOME.enabled && (
+                      <AtHomeAddOn open={membershipSelected} selected={atHomeSelected} onToggle={toggleAtHome} />
+                    )}
                   </div>
                 </div>
               )}

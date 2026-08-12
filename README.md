@@ -118,7 +118,8 @@ percentage and the ring from it. **Never send a percentage.**
 ### The at-home draw
 
 One charged item is **not** in the payload: the at-home blood draw
-([`src/data/atHome.js`](src/data/atHome.js), $79). It belongs to the Baseline
+([`src/data/atHome.js`](src/data/atHome.js), $75, currently hidden behind its
+`enabled` flag). It belongs to the Baseline
 plan rather than being a product of its own — it appears inside the plan's card,
 is revealed only once the plan is selected, and is dropped again if the plan is
 deselected. It adds to the total but contributes no markers, so the coverage
