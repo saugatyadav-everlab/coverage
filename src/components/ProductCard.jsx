@@ -51,8 +51,7 @@ export function ProductCard({ product, outdatedTotal, selected, onToggle, money 
             </span>
           )
         }
-        price={product.paid ? <PaidLabel /> : money(product.priceToShow)}
-        priceNote={product.paid ? 'Booking pending' : product.priceSubtitle}
+        selected={selected || product.paid}
       />
 
       <div className="rcard-rule border-br-neutral-tertiary-100" />

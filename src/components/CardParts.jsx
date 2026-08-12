@@ -1,4 +1,5 @@
 import { DS } from '../ds/loadDs'
+import { CheckIcon } from './icons'
 import { ProgressRing } from './charts'
 
 /**
@@ -12,12 +13,26 @@ import { ProgressRing } from './charts'
  */
 
 /**
- * The price and its note.
- *
- * Rendered in both the head and the foot, with CSS showing exactly one: the
- * two sit in different containers at the two breakpoints, and `display: none`
- * keeps the hidden copy out of the accessibility tree as well as the page.
+ * The selection state, as a circle. Shared with the at-home row so one choice
+ * looks the same wherever it is offered.
  */
+export function SelectCircle({ selected, size = 24 }) {
+  return (
+    <span
+      className={
+        selected
+          ? 'selcircle bg-bg-neutral-primary-100 text-fg-neutral-primary-invert-100'
+          : 'selcircle selcircle--empty border-br-neutral-secondary-100'
+      }
+      style={{ width: size, height: size }}
+      aria-hidden="true"
+    >
+      {selected && <CheckIcon size={Math.round(size * 0.52)} />}
+    </span>
+  )
+}
+
+/** The price and its note. */
 function Price({ className, price, note }) {
   return (
     <div className={className}>
@@ -31,8 +46,8 @@ function Price({ className, price, note }) {
   )
 }
 
-/** Image, title and sub-line, with the price opposite on wide layouts. */
-export function CardHead({ image, title, subtitle, price, priceNote }) {
+/** Image, title and sub-line, with the selection circle opposite. */
+export function CardHead({ image, title, subtitle, selected }) {
   return (
     <div className="rcard-head">
       {image && <img className="rcard-media rounded-3xl" src={image} alt="" loading="lazy" />}
@@ -42,7 +57,7 @@ export function CardHead({ image, title, subtitle, price, priceNote }) {
         {subtitle}
       </div>
 
-      <Price className="rcard-head-price" price={price} note={priceNote} />
+      <SelectCircle selected={selected} />
     </div>
   )
 }

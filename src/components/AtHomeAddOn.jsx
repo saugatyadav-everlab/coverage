@@ -1,5 +1,5 @@
 import { DS } from '../ds/loadDs'
-import { CheckIcon } from './icons'
+import { SelectCircle } from './CardParts'
 import { AT_HOME } from '../data/atHome'
 
 /**
@@ -45,15 +45,7 @@ export function AtHomeAddOn({ open, selected, onToggle }) {
             </div>
           </div>
 
-          <span
-            className={
-              selected
-                ? 'athome-check bg-bg-neutral-primary-100 text-fg-neutral-primary-invert-100'
-                : 'athome-check athome-check--empty border-br-neutral-secondary-100'
-            }
-          >
-            {selected && <CheckIcon size={12} />}
-          </span>
+          <SelectCircle selected={selected} size={20} />
         </div>
       </div>
     </div>

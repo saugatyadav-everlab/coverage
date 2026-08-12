@@ -46,8 +46,7 @@ export function MembershipCard({ product, outdatedTotal, selected, onToggle, mon
             At home test available for convenience
           </span>
         }
-        price={money(product.price)}
-        priceNote={product.priceNote}
+        selected={selected}
       />
 
       <div className="rcard-rule border-br-neutral-tertiary-100" />

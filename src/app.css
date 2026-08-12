@@ -463,11 +463,17 @@ html[data-embedded='1'] .shell {
   display: flex;
   flex-direction: column;
 }
-/* Figma 330:76190. Wide layouts put the price opposite the name, so the head
-   row carries the whole offer; narrow ones fall back to the footer copy. */
-.rcard-head-price {
+/* The selection circle closes the title row at both widths. */
+.selcircle {
   flex: none;
-  text-align: right;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.selcircle--empty {
+  border-width: 1.5px;
+  border-style: solid;
 }
 /* Both are mobile-only: wide layouts click the card itself and keep the footer
    on one line. */
@@ -512,7 +518,6 @@ html[data-embedded='1'] .shell {
   gap: 2px;
 }
 .rcard-price {
-  display: none;
   flex: none;
   text-align: right;
 }
@@ -656,19 +661,6 @@ html[data-embedded='1'] .shell {
   justify-content: center;
   box-shadow: 0 1px 2px -1px rgba(0, 0, 0, 0.06), 0 1px 3px 0 rgba(0, 0, 0, 0.06);
 }
-.athome-check {
-  flex: none;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.athome-check--empty {
-  border-width: 1.5px;
-  border-style: solid;
-}
 
 /* Ring on the right in the sticky column; the narrow-layout bar keeps it on the
    left, where it leads the row. */
@@ -718,11 +710,6 @@ html[data-embedded='1'] .shell {
     font: var(--ds-typography-font-body-200-medium);
     letter-spacing: var(--ds-letter-spacing-typography-font-body-200-medium);
   }
-  /* The price drops to the footer, next to the Add button, leaving the image
-     and the name side by side. */
-  .rcard-head-price {
-    display: none;
-  }
   /* Refresh line, rule, then price against an Add button. */
   .rcard-foot {
     display: grid;
@@ -745,7 +732,6 @@ html[data-embedded='1'] .shell {
     border-top-style: solid;
   }
   .rcard-price {
-    display: block;
     grid-area: price;
     text-align: left;
   }
