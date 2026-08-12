@@ -24,32 +24,19 @@ a:hover {
 
 /* The shell is the container-query root, so breakpoints follow the embedded
    iframe's width rather than the outer window's. */
+/* Always full height so the content fills the embedding modal, top to bottom,
+   rather than floating in a short box. A flex column lets `.page` grow into it. */
 .shell {
   container-type: inline-size;
   margin: 0 auto;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
   transition: width 0.18s ease;
 }
 
-/* Set while we're auto-sizing an embedding iframe — see host.js/observeHeight. */
-html[data-embedded='1'] .shell {
-  min-height: 0;
-}
-
-.top {
-  padding: 22px 40px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-.top svg {
-  height: 22px;
-  width: auto;
-  display: block;
-}
-
 .page {
+  flex: 1;
   padding: 0 40px 120px;
 }
 .page--refresh {
@@ -237,9 +224,6 @@ html[data-embedded='1'] .shell {
 }
 
 @container (max-width: 860px) {
-  .top {
-    padding: 14px 16px;
-  }
   .page {
     padding: 0 16px 108px;
   }

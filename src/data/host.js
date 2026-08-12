@@ -134,25 +134,16 @@ export function listen(handlers) {
 }
 
 /**
- * Report our document height to the host whenever it changes, so the embedding
- * iframe can size itself and avoid a nested scrollbar.
- *
- * The `data-embedded` flag drops the shell's `min-height: 100vh` (see app.css).
- * Without that, a host that sizes the iframe to the height we report pins the
- * content to at least that height, so the measurement can only ever grow —
- * navigating from a tall page to a short one would leave the frame oversized.
- * A host that ignores these messages and fixes the iframe height still looks
- * right, because the body background propagates to the frame's canvas.
+ * Report our document height to the host whenever it changes — advisory, for a
+ * host that autosizes its iframe to the content. Everlab's modal renders us at a
+ * fixed height and ignores this (the shell fills that height; see app.css), so
+ * it's a no-op there and safe for any other host that wants to size to content.
  */
 export function observeHeight() {
   if (!isEmbedded() || typeof ResizeObserver === 'undefined') return () => {}
 
-  document.documentElement.dataset.embedded = '1'
-
   let last = 0
   const report = () => {
-    // Measure the body, not documentElement: <html> stretches to the frame's
-    // own height, so it reports the size we asked for rather than our content's.
     const height = Math.ceil(document.body.scrollHeight)
     if (height && height !== last) {
       last = height
@@ -164,8 +155,5 @@ export function observeHeight() {
   observer.observe(document.body)
   report()
 
-  return () => {
-    observer.disconnect()
-    delete document.documentElement.dataset.embedded
-  }
+  return () => observer.disconnect()
 }

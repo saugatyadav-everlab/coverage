@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 
 import { DS } from '../ds/loadDs'
 import { PageShell } from '../components/PageShell'
@@ -13,7 +12,7 @@ import { useCoverage } from '../data/CoverageProvider'
 import { computeSelection } from '../data/products'
 import { AT_HOME } from '../data/atHome'
 import { summaryLines } from '../data/summary'
-import { ACTION, MESSAGE, emit, emitAction } from '../data/host'
+import { ACTION, emitAction } from '../data/host'
 import { formatMoney } from '../data/format'
 
 /** Prices depend on whether the membership is in the basket, so decorate late. */
@@ -62,7 +61,6 @@ function SummaryPanel({ selection, membership, money, order, onCheckout, checkou
 }
 
 export default function RefreshPage() {
-  const navigate = useNavigate()
   const { payload, catalogue } = useCoverage()
   const { membership, products, outdated } = catalogue
 
@@ -167,12 +165,7 @@ export default function RefreshPage() {
   )
 
   return (
-    <PageShell
-      onLogoClick={() => {
-        emit(MESSAGE.NAVIGATE, { page: 'bridge' })
-        navigate({ pathname: '/', search: window.location.search })
-      }}
-    >
+    <PageShell>
       <div className="page page--refresh">
         <div style={{ maxWidth: 1180, margin: '0 auto' }}>
           <div style={{ padding: '30px 0 26px' }}>
