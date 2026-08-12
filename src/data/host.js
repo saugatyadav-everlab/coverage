@@ -25,6 +25,12 @@
  * otherwise '*' — safe, because pre-handshake messages carry no member data.
  */
 
+// ⚠️ CONTRACT WITH THE EVERLAB PATIENT APP — DO NOT rename these string values.
+// They are matched verbatim by the app's postMessage bridge
+// (apps/patientApp/webV2/src/components/Renewal/coverageBridge.ts in ev-admin):
+// the app POSTS `DATA` and LISTENS FOR `READY`. Changing a value silently breaks
+// the handshake in shipped native builds that can't be hot-fixed — coordinate any
+// change on both sides. Adding new protocol messages is safe; renaming is not.
 export const MESSAGE = {
   DATA: 'everlab:coverage:data',
   THEME: 'everlab:coverage:theme',
@@ -35,7 +41,11 @@ export const MESSAGE = {
   ERROR: 'everlab:coverage:error',
 }
 
-/** The member actions the host acts on, sent via `emitAction`. `action` is the host's allow-list key. */
+// ⚠️ CONTRACT WITH THE EVERLAB PATIENT APP — DO NOT change `ACTION_SOURCE` or the
+// `ACTION` values. The app validates `event.data.source === 'everlab-coverage'`
+// and switches on `action` as its navigation allow-list key (coverageBridge.ts).
+// A renamed source is dropped as untrusted; a renamed action silently no-ops.
+// Add a new action only in lockstep with a handler on the app side.
 export const ACTION_SOURCE = 'everlab-coverage'
 export const ACTION_EVENT = 'everlab:coverage:action'
 export const ACTION = {
@@ -88,6 +98,10 @@ export function emit(type, detail = {}) {
   post({ type, ...detail }, type)
 }
 
+// ⚠️ CONTRACT WITH THE EVERLAB PATIENT APP — the envelope MUST stay flat and keep
+// the field names `source` and `action` (plus per-action fields like the checkout
+// `priceDefinitionIds`). The app parses this exact shape; nesting it or renaming a
+// field breaks parsing. See coverageBridge.ts in ev-admin.
 /** Send a member action the host acts on — a flat { source, action, …detail } envelope. */
 export function emitAction(action, detail = {}) {
   post({ source: ACTION_SOURCE, action, ...detail }, ACTION_EVENT)

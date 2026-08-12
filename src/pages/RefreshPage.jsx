@@ -128,6 +128,11 @@ export default function RefreshPage() {
    * checkout. Every selected item's `id` is a PriceDefinition id (they come
    * straight from the host's entry payload), so the host takes the flat list
    * as-is — this page deliberately does not implement checkout itself.
+   *
+   * ⚠️ CONTRACT WITH THE EVERLAB PATIENT APP — the app feeds `priceDefinitionIds`
+   * straight into its /checkout route. Each id MUST be a PriceDefinition id and
+   * the field MUST be named `priceDefinitionIds`. Emitting the flow's own product
+   * ids, or renaming the field, sends the member to a broken checkout.
    */
   const handleCheckout = () => {
     const priceDefinitionIds = [

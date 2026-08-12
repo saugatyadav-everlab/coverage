@@ -1,6 +1,15 @@
 /**
  * Everlab Coverage payload — schema v1.
  *
+ * ⚠️ CONTRACT WITH THE EVERLAB PATIENT APP. This shape is the app-facing input
+ * contract: the patient app ASSEMBLES this object server-side to match it
+ * (renewalCoveragePayload.ts in ev-admin) and posts it as the DATA message.
+ * Renaming or restructuring a field the pages read (e.g. `profile.*`, `products[].id`)
+ * silently breaks rendering for a payload the app is still sending in the old shape.
+ * Add optional fields freely; change existing ones only in lockstep with the app.
+ * NOTE: `products[].id` must remain the PriceDefinition id — it round-trips back
+ * out through the checkout action.
+ *
  * This is the contract between your app and this site. Everything the two
  * pages render is derived from one object of this shape; nothing is fetched
  * from an Everlab API by this site itself.
