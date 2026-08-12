@@ -13,7 +13,7 @@ import { useCoverage } from '../data/CoverageProvider'
 import { computeSelection } from '../data/products'
 import { AT_HOME } from '../data/atHome'
 import { summaryLines } from '../data/summary'
-import { MESSAGE, emit } from '../data/host'
+import { ACTION, MESSAGE, emit, emitAction } from '../data/host'
 import { formatMoney } from '../data/format'
 
 /** Prices depend on whether the membership is in the basket, so decorate late. */
@@ -125,32 +125,18 @@ export default function RefreshPage() {
 
   /**
    * The checkout button hands off to the embedding app, which opens its own
-   * modal. This page deliberately does not implement the modal.
+   * checkout. Every selected item's `id` is a PriceDefinition id (they come
+   * straight from the host's entry payload), so the host takes the flat list
+   * as-is — this page deliberately does not implement checkout itself.
    */
   const handleCheckout = () => {
-    emit(MESSAGE.CHECKOUT, {
-      selection: {
-        membership: membershipSelected ? { id: membership?.id, name: membership?.name, price: membership?.price } : null,
-        atHome: selection.atHomeCharged ? { id: AT_HOME.id, name: AT_HOME.name, price: AT_HOME.price } : null,
-        productIds: selection.chosen.map((product) => product.id),
-        products: selection.chosen.map((product) => ({
-          id: product.id,
-          name: product.name,
-          price: selection.priceOf(product),
-        })),
-      },
-      totals: {
-        subtotal: selection.subtotal,
-        discount: selection.saved,
-        total: selection.total,
-        currency: payload.currency,
-      },
-      coverage: {
-        refreshed: selection.refreshed,
-        outdated: selection.outdatedTotal,
-        remaining: selection.remaining,
-      },
-    })
+    const priceDefinitionIds = [
+      membershipSelected ? membership?.id : null,
+      selection.atHomeCharged ? AT_HOME.id : null,
+      ...selection.chosen.map((product) => product.id),
+    ].filter(Boolean)
+
+    emitAction(ACTION.CHECKOUT, { priceDefinitionIds })
   }
 
   const priced = products.map((product) => withPricing(product, selection.isMember, money))

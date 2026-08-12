@@ -132,8 +132,26 @@
       window.addEventListener('message', (event) => {
         if (event.source !== frame.contentWindow) return
         const data = event.data
-        if (!data?.type?.startsWith?.('everlab:')) return
+        if (typeof data !== 'object' || data === null) return
 
+        // Member actions: a flat { source, action } envelope — what your host acts on.
+        if (data.source === 'everlab-coverage') {
+          switch (data.action) {
+            case 'dismiss':
+              write('dismiss requested — dismiss your overlay here')
+              break
+            case 'checkout':
+              // >>> This is where YOUR checkout opens. <<<
+              write(`checkout → priceDefinitionIds ${JSON.stringify(data.priceDefinitionIds)}`, true)
+              break
+            default:
+              write(`action ${data.action}`)
+          }
+          return
+        }
+
+        // Operational protocol.
+        if (!data.type?.startsWith?.('everlab:')) return
         switch (data.type) {
           case 'everlab:coverage:ready':
             write('frame ready → sending payload')
@@ -143,17 +161,6 @@
           case 'everlab:coverage:resize':
             // Size the iframe to its content so there's no nested scrollbar.
             // (This console keeps a fixed-height frame, so it just logs.)
-            break
-
-          case 'everlab:coverage:close':
-            write('close requested — dismiss your overlay here')
-            break
-
-          case 'everlab:refresh:checkout':
-            // >>> This is where YOUR checkout modal opens. <<<
-            write(`checkout → ${JSON.stringify(data.totals)}`, true)
-            write(`  coverage ${JSON.stringify(data.coverage)}`)
-            write(`  items ${JSON.stringify(data.selection)}`)
             break
 
           default:

@@ -6,16 +6,19 @@
  *   { type: 'everlab:coverage:data',  payload: <schema.js payload> }
  *   { type: 'everlab:coverage:theme', theme: 'light' | 'dark' | 'auto' }
  *
- * OUTBOUND (site -> host)
+ * OUTBOUND — operational protocol (site -> host)
  *   { type: 'everlab:coverage:ready' }                    // send the payload now
  *   { type: 'everlab:coverage:resize',   height }         // for iframe autosizing
- *   { type: 'everlab:coverage:close' }                    // the X button
  *   { type: 'everlab:coverage:navigate', page }           // 'bridge' | 'refresh'
- *   { type: 'everlab:refresh:checkout',  selection, totals, coverage }
- *                                                          // <- opens YOUR modal
  *
- * Every outbound message is also dispatched as a `CustomEvent` of the same name
- * on `window`, so a same-page (non-iframe) embed can listen without postMessage.
+ * OUTBOUND — member actions (site -> host); a flat { source, action } envelope
+ * where `action` is the host's allow-list key. These are what the host acts on.
+ *   { source: 'everlab-coverage', action: 'dismiss' }                          // the X button
+ *   { source: 'everlab-coverage', action: 'checkout', priceDefinitionIds: [] } // <- opens YOUR checkout
+ *
+ * Every outbound message is also dispatched as a `CustomEvent` on `window`
+ * (named by `type` for protocol messages, `everlab:coverage:action` for actions),
+ * so a same-page (non-iframe) embed can listen without postMessage.
  *
  * Origin handling: the site replies to the exact origin that sent it the data.
  * Until that handshake completes it posts to `VITE_HOST_ORIGIN` if configured,
@@ -28,10 +31,16 @@ export const MESSAGE = {
   READY: 'everlab:coverage:ready',
   RESIZE: 'everlab:coverage:resize',
   SCROLL_TOP: 'everlab:coverage:scrolltop',
-  CLOSE: 'everlab:coverage:close',
   NAVIGATE: 'everlab:coverage:navigate',
   ERROR: 'everlab:coverage:error',
-  CHECKOUT: 'everlab:refresh:checkout',
+}
+
+/** The member actions the host acts on, sent via `emitAction`. `action` is the host's allow-list key. */
+export const ACTION_SOURCE = 'everlab-coverage'
+export const ACTION_EVENT = 'everlab:coverage:action'
+export const ACTION = {
+  DISMISS: 'dismiss',
+  CHECKOUT: 'checkout',
 }
 
 export const isEmbedded = () => {
@@ -63,16 +72,25 @@ function replyTarget() {
 
 const hostWindow = () => (window.opener && !isEmbedded() ? window.opener : window.parent)
 
-/** Send a message to the embedding app, and mirror it as a DOM CustomEvent. */
-export function emit(type, detail = {}) {
-  const message = { type, ...detail }
+/** Post `message` to the embedding app, and mirror it as a DOM CustomEvent named `eventName`. */
+function post(message, eventName) {
   try {
     const target = hostWindow()
     if (target && target !== window) target.postMessage(message, replyTarget())
   } catch (error) {
     console.warn('[coverage] postMessage to host failed', error)
   }
-  window.dispatchEvent(new CustomEvent(type, { detail: message }))
+  window.dispatchEvent(new CustomEvent(eventName, { detail: message }))
+}
+
+/** Send an operational protocol message (ready, resize, navigate, …). */
+export function emit(type, detail = {}) {
+  post({ type, ...detail }, type)
+}
+
+/** Send a member action the host acts on — a flat { source, action, …detail } envelope. */
+export function emitAction(action, detail = {}) {
+  post({ source: ACTION_SOURCE, action, ...detail }, ACTION_EVENT)
 }
 
 /**

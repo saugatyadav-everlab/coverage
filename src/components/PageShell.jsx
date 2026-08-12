@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import { DS } from '../ds/loadDs'
-import { MESSAGE, emit, observeHeight } from '../data/host'
+import { ACTION, emitAction, observeHeight } from '../data/host'
 
 /**
  * Shared chrome: the container-query shell, the top bar, and (behind
@@ -51,7 +51,7 @@ export function PageShell({ children, footer, onLogoClick }) {
             size="sm"
             shape="system"
             label="Close"
-            onClick={() => emit(MESSAGE.CLOSE)}
+            onClick={() => emitAction(ACTION.DISMISS)}
           >
             <DS.IconX size={16} />
           </DS.IconButton>
