@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
 
 import { DS } from '../ds/loadDs'
 import { PageShell } from '../components/PageShell'
@@ -13,7 +12,7 @@ import { useCoverage } from '../data/CoverageProvider'
 import { computeSelection } from '../data/products'
 import { AT_HOME } from '../data/atHome'
 import { summaryLines } from '../data/summary'
-import { MESSAGE, emit } from '../data/host'
+import { ACTION, emitAction } from '../data/host'
 import { formatMoney } from '../data/format'
 
 /** Prices depend on whether the membership is in the basket, so decorate late. */
@@ -62,7 +61,6 @@ function SummaryPanel({ selection, membership, money, order, onCheckout, checkou
 }
 
 export default function RefreshPage() {
-  const navigate = useNavigate()
   const { payload, catalogue } = useCoverage()
   const { membership, products, outdated } = catalogue
 
@@ -125,32 +123,23 @@ export default function RefreshPage() {
 
   /**
    * The checkout button hands off to the embedding app, which opens its own
-   * modal. This page deliberately does not implement the modal.
+   * checkout. Every selected item's `id` is a PriceDefinition id (they come
+   * straight from the host's entry payload), so the host takes the flat list
+   * as-is — this page deliberately does not implement checkout itself.
+   *
+   * ⚠️ CONTRACT WITH THE EVERLAB PATIENT APP — the app feeds `priceDefinitionIds`
+   * straight into its /checkout route. Each id MUST be a PriceDefinition id and
+   * the field MUST be named `priceDefinitionIds`. Emitting the flow's own product
+   * ids, or renaming the field, sends the member to a broken checkout.
    */
   const handleCheckout = () => {
-    emit(MESSAGE.CHECKOUT, {
-      selection: {
-        membership: membershipSelected ? { id: membership?.id, name: membership?.name, price: membership?.price } : null,
-        atHome: selection.atHomeCharged ? { id: AT_HOME.id, name: AT_HOME.name, price: AT_HOME.price } : null,
-        productIds: selection.chosen.map((product) => product.id),
-        products: selection.chosen.map((product) => ({
-          id: product.id,
-          name: product.name,
-          price: selection.priceOf(product),
-        })),
-      },
-      totals: {
-        subtotal: selection.subtotal,
-        discount: selection.saved,
-        total: selection.total,
-        currency: payload.currency,
-      },
-      coverage: {
-        refreshed: selection.refreshed,
-        outdated: selection.outdatedTotal,
-        remaining: selection.remaining,
-      },
-    })
+    const priceDefinitionIds = [
+      membershipSelected ? membership?.id : null,
+      selection.atHomeCharged ? AT_HOME.id : null,
+      ...selection.chosen.map((product) => product.id),
+    ].filter(Boolean)
+
+    emitAction(ACTION.CHECKOUT, { priceDefinitionIds })
   }
 
   const priced = products.map((product) => withPricing(product, selection.isMember, money))
@@ -176,12 +165,7 @@ export default function RefreshPage() {
   )
 
   return (
-    <PageShell
-      onLogoClick={() => {
-        emit(MESSAGE.NAVIGATE, { page: 'bridge' })
-        navigate({ pathname: '/', search: window.location.search })
-      }}
-    >
+    <PageShell>
       <div className="page page--refresh">
         <div style={{ maxWidth: 1180, margin: '0 auto' }}>
           <div style={{ padding: '30px 0 26px' }}>

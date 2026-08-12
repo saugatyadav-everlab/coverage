@@ -39,6 +39,10 @@ const DEFAULT_TIMEOUT_MS = 8000
 
 async function fromHost(timeoutMs) {
   return new Promise((resolve, reject) => {
+    // ⚠️ CONTRACT WITH THE EVERLAB PATIENT APP — this is the app-facing half of the
+    // handshake: we emit READY, the app replies with a DATA message whose `payload`
+    // is the schema.js shape (see coverageBridge.ts / RenewalCoverageModal.tsx in
+    // ev-admin). Keep reading `.payload`, and keep emitting READY, in lockstep.
     const stop = listen({
       [MESSAGE.DATA]: (message) => {
         clearTimeout(timer)
