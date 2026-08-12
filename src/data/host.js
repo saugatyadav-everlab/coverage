@@ -11,10 +11,13 @@
  *   { type: 'everlab:coverage:resize',   height }         // for iframe autosizing
  *   { type: 'everlab:coverage:navigate', page }           // 'bridge' | 'refresh'
  *
- * OUTBOUND — member actions (site -> host); a flat { source, action } envelope
- * where `action` is the host's allow-list key. These are what the host acts on.
- *   { source: 'everlab-coverage', action: 'dismiss' }                          // the X button
- *   { source: 'everlab-coverage', action: 'checkout', priceDefinitionIds: [] } // <- opens YOUR checkout
+ * OUTBOUND — member actions (site -> host), each sent via `emitAction`; a flat
+ * { source, action } envelope where `action` is the host's allow-list key. These
+ * are what the host acts on. Emit either from any control you add:
+ *   { source: 'everlab-coverage', action: 'dismiss' }                          // ask the host to close the modal
+ *   { source: 'everlab-coverage', action: 'checkout', priceDefinitionIds: [] } // <- opens the host's checkout
+ * Note: the host's modal already provides its own close button, so there is no
+ * built-in `dismiss` trigger here — emit it only if you add an in-flow "not now".
  *
  * Every outbound message is also dispatched as a `CustomEvent` on `window`
  * (named by `type` for protocol messages, `everlab:coverage:action` for actions),

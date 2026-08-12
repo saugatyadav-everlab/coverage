@@ -186,14 +186,18 @@ Outbound — **operational protocol** (page → your app), each also dispatched 
 | `everlab:coverage:navigate` | `{ page: 'bridge' \| 'refresh' }` |
 | `everlab:coverage:scrolltop` | Route changed — scroll your frame back to the top |
 
-Outbound — **member actions** (page → your app). A flat `{ source, action }`
-envelope where `action` is your allow-list key; these are what your host acts on.
-Mirrored on `window` as a `CustomEvent` named `everlab:coverage:action`.
+Outbound — **member actions** (page → your app), each sent via `emitAction(action, detail)`.
+A flat `{ source, action }` envelope where `action` is your allow-list key; these are
+what your host acts on. Mirrored on `window` as a `CustomEvent` named `everlab:coverage:action`.
 
 | Message | Meaning |
 | --- | --- |
-| `{ source: 'everlab-coverage', action: 'dismiss' }` | The X was pressed — dismiss the modal |
+| `{ source: 'everlab-coverage', action: 'dismiss' }` | Ask the host to close the modal |
 | `{ source: 'everlab-coverage', action: 'checkout', priceDefinitionIds: string[] }` | **Open your checkout** with these PriceDefinition ids |
+
+The host's modal owns its own close button, so there is **no** built-in `dismiss`
+trigger in the flow — call `emitAction(ACTION.DISMISS)` from any in-flow control
+you add (e.g. a "not now" button). `checkout` is wired to the Refresh page's CTA.
 
 The page replies to the exact origin that sent it data. Set `VITE_HOST_ORIGIN`
 (comma-separated) to reject inbound messages from anywhere else.
